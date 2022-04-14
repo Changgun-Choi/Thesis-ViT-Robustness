@@ -86,7 +86,8 @@ if __name__ == '__main__':
     ])    
     epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
     #epsilons = [0, 0.1/255] 
-    testset = torchvision.datasets.ImageNet('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/data/val', split='val', download=None, transform=test_transform)
+    data_path = './data'
+    testset = torchvision.datasets.ImageNet('data_path', split='val', download=None, transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.01 : 500
     valset = torch.utils.data.Subset(testset, sample) 
     val_loader = torch.utils.data.DataLoader(valset, args.batch_size ,drop_last=True)
@@ -212,7 +213,8 @@ if __name__ == '__main__':
 
 #worst case (best attack per-sample)-
 #   [0.94 0.81 0.69 0.38 0.31 0.12 0.06 0.   0.   0.  ]      
-                #%%
+#%%
+# https://colab.research.google.com/drive/1muZ4QFgVfwALgqmrfOkp7trAvqDemckO?usp=sharing
                 
 "FGSM : Resnet"
 #robust accuracy for perturbations with
