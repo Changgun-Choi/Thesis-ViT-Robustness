@@ -87,7 +87,7 @@ if __name__ == '__main__':
     epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
     #epsilons = [0, 0.1/255] 
     data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
-    #data_path
+    #data_path = '/home/cchoi/Thesis_data/val'
     testset = torchvision.datasets.ImageNet(data_path, split='val', download=None, transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.01 : 500
     valset = torch.utils.data.Subset(testset, sample) 
