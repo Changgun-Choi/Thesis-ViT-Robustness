@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
-#python vit_foolbox_robust.py --model_name vit --attack_name LinfPGD --batch_size 8 --data_divide 100 
+#python vit_foolbox_robust.py --model_name vit --attack_name LinfPGD --batch_size 8 --data_divide 10 --data_path server
 # nvidia-smi
 """
 A simple example that demonstrates how to run a single attack against
@@ -38,7 +38,8 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', default='vit', type=str, help='data name')    
     parser.add_argument('--attack_name', default='LinfPGD', type=str, help='attack name') 
     parser.add_argument('--batch_size',default = 8, type = int)
-    parser.add_argument('--data_divide',default = 100, type = int, help = 'multiply by 0.01')  # 500
+    parser.add_argument('--data_divide',default = 100, type = int, help = 'multiply by 0.01')  # 500  args.data_path 
+    parser.add_argument('--data_path',default = 'local', type = str) 
     args = parser.parse_args()
     #print(args)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")   ############################################
@@ -86,8 +87,12 @@ if __name__ == '__main__':
     ])    
     epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
     #epsilons = [0, 0.1/255] 
-    data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
-    #data_path = '/home/cchoi/Thesis_data/val'
+    
+    if args.data_path == 'local':
+        data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
+    elif args.data_path == 'server':
+        data_path = '/home/cchoi/Thesis_data/val'
+        
     testset = torchvision.datasets.ImageNet(data_path, split='val', download=None, transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.01 : 500
     valset = torch.utils.data.Subset(testset, sample) 
