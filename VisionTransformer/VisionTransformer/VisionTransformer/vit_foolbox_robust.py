@@ -1,7 +1,7 @@
 #Server
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate pytorch
-
+# python vit_foolbox_robust.py --model_name swin_base vit --attack_name FGSM --batch_size 8 --data_divide 100 --data_path server
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
