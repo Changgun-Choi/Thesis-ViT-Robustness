@@ -1,4 +1,5 @@
 #Server
+# cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate pytorch
 
 
