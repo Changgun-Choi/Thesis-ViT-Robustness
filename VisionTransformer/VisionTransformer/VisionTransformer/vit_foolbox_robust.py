@@ -76,7 +76,7 @@ if __name__ == '__main__':
         model = deit_base_patch16_224(pretrained=True).eval().to(device)  
    
     elif args.model_name == 'swin_base':
-        model = timm.create_model('swin_s3_base_224', pretrained=True).eval().to(device)
+        model = timm.create_model('swin_base_patch4_window7_224', pretrained=True).eval().to(device)
         
     elif args.model_name == 'swin_path4':
         model = timm.create_model('swin_s3_base_224', pretrained=True).eval().to(device)
