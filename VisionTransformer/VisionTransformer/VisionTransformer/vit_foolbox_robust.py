@@ -118,7 +118,7 @@ if __name__ == '__main__':
     elif args.data_path == 'server':
         data_path = '/home/cchoi/Thesis_data/val'
         
-    testset = torchvision.datasets.ImageNet(data_path, split='val', download=None, transform=test_transform)
+    testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.01 : 500
     valset = torch.utils.data.Subset(testset, sample) 
     val_loader = torch.utils.data.DataLoader(valset, args.batch_size ,drop_last=True)
