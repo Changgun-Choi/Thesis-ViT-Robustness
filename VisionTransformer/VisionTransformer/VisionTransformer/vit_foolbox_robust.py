@@ -1,6 +1,10 @@
+#Server
+#conda activate pytorch
+
+
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
-#python vit_foolbox_robust.py --model_name vit --attack_name LinfPGD --batch_size 8 --data_divide 10 --data_path server
+#python vit_foolbox_robust.py --model_name vit --attack_name LinfPGD --batch_size 8 --data_divide 100 --data_path server
 # nvidia-smi
 """
 A simple example that demonstrates how to run a single attack against
@@ -20,9 +24,9 @@ from foolbox.attacks import LinfPGD
 import foolbox.attacks as attack
 import foolbox.attacks as fa
 import foolbox as fb
-import argparse ##############  Use in Terminal
+import argparse 
 import timm
-assert timm.__version__ == "0.3.2"
+#assert timm.__version__ == "0.3.2"
 import gc
 gc.collect()
 torch.cuda.empty_cache()
@@ -38,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', default='vit', type=str, help='data name')    
     parser.add_argument('--attack_name', default='LinfPGD', type=str, help='attack name') 
     parser.add_argument('--batch_size',default = 8, type = int)
-    parser.add_argument('--data_divide',default = 100, type = int, help = 'multiply by 0.01')  # 500  args.data_path 
+    parser.add_argument('--data_divide',default = 100, type = int, help = 'multiply by 0.01')  # /100 : 500  args.data_path 
     parser.add_argument('--data_path',default = 'local', type = str) 
     args = parser.parse_args()
     #print(args)
@@ -48,13 +52,13 @@ if __name__ == '__main__':
     if args.model_name == 'resnet':
         model = torchvision.models.resnet18(pretrained=True).eval().to(device)
         
-    elif args.model_name == 'efficient':  # clean accuracy:  87.5 %
+    elif args.model_name == 'efficient':  
         model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
     
-    elif args.model_name == 'vit': # clean accuracy:  81.2 %
+    elif args.model_name == 'vit':
         model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)    
         
-    elif args.model_name == 'deit': # clean accuracy:  87.5 %
+    elif args.model_name == 'deit': 
         #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
         def deit_base_patch16_224(pretrained=False, **kwargs):
             model = VisionTransformer(
@@ -70,6 +74,26 @@ if __name__ == '__main__':
             return model
         model = deit_base_patch16_224(pretrained=True).eval().to(device)  
    
+    elif args.model_name == 'swin_base':
+        model = timm.create_model('swin_s3_base_224', pretrained=True).eval().to(device)
+        
+    elif args.model_name == 'swin_path4':
+        model = timm.create_model('swin_s3_base_224', pretrained=True).eval().to(device)
+
+        model = timm.create_model('swin_large_patch4_window7_224', pretrained=True)
+
+        
+        model = timm.create_model('swin_large_patch4_window12_384_in22k', in_chans = 3, pretrained = True,)
+        model = timm.create_model('swin_base_patch4_window7_224_in22k', pretrained=True)
+        from transformers import SwinModel
+        import timm
+        model = SwinModel.from_pretrained("microsoft/swin-tiny-patch4-window7-224")
+        from timm.models import swin_base_patch4_window7_224_in22k
+        timm.list_models(pretrained=True) 
+        timm.list_models('*sw*')
+   
+        
+        
     elif args.model_name == 'dino_vit':      # clean accuracy:  0.0 %
         model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16', pretrained=True).eval().to(device)
         
@@ -98,22 +122,34 @@ if __name__ == '__main__':
     valset = torch.utils.data.Subset(testset, sample) 
     val_loader = torch.utils.data.DataLoader(valset, args.batch_size ,drop_last=True)
     
+    "clean_accuracy"    
+    def get_acc(model, inputs, labels):
+        with torch.no_grad():
+            predictions = model(inputs).argmax(axis=-1)
+            accuracy = (predictions == labels).float().mean()
+            return accuracy.item() 
+        
     #images, labels = ep.astensors(*samples(fmodel, dataset="imagenet", batchsize=8))  # samples() has only 20 samples and repeats itself if batchsize > 20
     #clean_acc = accuracy(fmodel, images, labels)
-    #print(f"clean accuracy:  {clean_acc * 100:.1f} %")     
+       
     if args.attack_name == 'PGD':  # single adversarial attack (Linf PGD)
-        attack = LinfPGD()     
+        attack = LinfPGD()
+        accuracy = 0 
         success = torch.zeros(len(epsilons),args.batch_size).cuda()
         for batch_idx, (image, label) in enumerate(val_loader):
             print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
             images = image.cuda()
             labels = label.cuda()
             #images, labels = ep.astensors(images, labels)
+            clean_acc = get_acc(fmodel, images, labels)
             raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)         
             succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
             #print(succ)
             success += succ
+            accuracy += clean_acc
             #print(success)
+        accuracy = accuracy / len(val_loader)
+        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
@@ -123,43 +159,53 @@ if __name__ == '__main__':
         
     elif args.attack_name == 'FGSM':
         attack = fa.FGSM()
+        accuracy = 0 
         success = torch.zeros(len(epsilons),args.batch_size).cuda()
         for batch_idx, (image, label) in enumerate(val_loader):
             print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
             images = image.cuda()
             labels = label.cuda()
             #images, labels = ep.astensors(images, labels)
+            clean_acc = get_acc(fmodel, images, labels)
             raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)         
-            succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy())
+            succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
             #print(succ)
             success += succ
+            accuracy += clean_acc
             #print(success)
+        accuracy = accuracy / len(val_loader)
+        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
         for eps, acc in zip(epsilons, robust_accuracy):
             print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")    
-        plt.plot(epsilons, robust_accuracy.cpu().numpy())
+        plt.plot(epsilons, robust_accuracy.cpu().numpy())  
         
     elif args.attack_name == 'DeepFool': 
         attack = fb.attacks.LinfDeepFoolAttack()
+        accuracy = 0 
         success = torch.zeros(len(epsilons),args.batch_size).cuda()
         for batch_idx, (image, label) in enumerate(val_loader):
             print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
             images = image.cuda()
             labels = label.cuda()
             #images, labels = ep.astensors(images, labels)
+            clean_acc = get_acc(fmodel, images, labels)
             raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)         
-            succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy())
+            succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
             #print(succ)
             success += succ
+            accuracy += clean_acc
             #print(success)
+        accuracy = accuracy / len(val_loader)
+        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
         for eps, acc in zip(epsilons, robust_accuracy):
-            print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")  
-        plt.plot(epsilons, robust_accuracy.cpu().numpy())
+            print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")    
+        plt.plot(epsilons, robust_accuracy.cpu().numpy())  
 #%%            
     elif args.attack_name == 'multiple_attacks': 
         attacks = [
@@ -237,17 +283,25 @@ if __name__ == '__main__':
  # Linf norm ≤ 0.00392156862745098: 25.0 %
  # Linf norm ≤ 0.011764705882352941: 16.9 %
 
-"FGSM: ViT" 
+"FGSM: ViT - clean_accuracy: 81.2 % "
 #  Linf norm ≤ 0     : 81.0 %
  # Linf norm ≤ 0.0003921568627450981: 69.8 %
   #Linf norm ≤ 0.001176470588235294: 53.6 %
  # Linf norm ≤ 0.00392156862745098: 33.3 %
  # Linf norm ≤ 0.011764705882352941: 22.0 %
+ 
+# clean accuracy:  83.7 %
+#robust accuracy for perturbations with
+#  Linf norm ≤ 0     : 83.7 %
+ # Linf norm ≤ 0.0003921568627450981: 70.8 %
+  #Linf norm ≤ 0.001176470588235294: 53.2 %
+  #Linf norm ≤ 0.00392156862745098: 29.4 %
+  #Linf norm ≤ 0.01568627450980392: 17.7 %
 
-"FGSM: DeiT"
+"FGSM: DeiT - clean_accuracy: 87.5 %"
 " Training data-efficient image transformers & distillation through attention"
 #  Linf norm ≤ 0     : 79.8 %
-#  Linf norm ≤ 0.0003921568627450981: 68.8 %        1) PGD > FGSM  2) SwinsTransformer
+#  Linf norm ≤ 0.0003921568627450981: 68.8 %         
  # Linf norm ≤ 0.001176470588235294: 59.9 %
   #Linf norm ≤ 0.00392156862745098: 44.4 %
   #Linf norm ≤ 0.011764705882352941: 34.5 %

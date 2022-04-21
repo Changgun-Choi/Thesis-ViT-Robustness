@@ -198,7 +198,7 @@ if __name__ == "__main__":
                 if j == 0:
                     plt.ylabel("Eps: {}".format(epsilons[i]), fontsize=14)
                 orig,adv,ex = examples[i][j]  # examples[epsilon][5 examples]
-                plt.title("{} -> {}".format(orig, adv)`)
+                plt.title("{} -> {}".format(orig, adv))
                 plt.imshow(ex)
                 #plt.imshow(ex, cmap="gray")
 
