@@ -6,7 +6,7 @@
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
-#python vit_foolbox_robust.py --model_name vit --attack_name LinfPGD --batch_size 8 --data_divide 100 --data_path server
+#python vit_foolbox_robust.py --model_name resnet --attack_name FGSM --batch_size 8 --data_divide 100 --data_path server
 # nvidia-smi
 """
 A simple example that demonstrates how to run a single attack against
@@ -313,6 +313,15 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.001176470588235294: 65.8 %
   #Linf norm ≤ 0.00392156862745098: 55.3 %
   #Linf norm ≤ 0.01568627450980392: 43.5 %
+  
+"FGSM: Swin"
+#clean accuracy:  87.6 %
+#robust accuracy for perturbations with
+ # Linf norm ≤ 0     : 87.6 %
+  #Linf norm ≤ 0.0003921568627450981: 76.6 %
+  #Linf norm ≤ 0.001176470588235294: 74.0 %
+  #Linf norm ≤ 0.00392156862745098: 67.4 %
+  #Linf norm ≤ 0.01568627450980392: 60.9 %
 #%%  
 "PGD: ResNet"
  # Linf norm ≤ 0     : 62.5 %
