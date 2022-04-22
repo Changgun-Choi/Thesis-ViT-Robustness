@@ -117,7 +117,7 @@ if __name__ == '__main__':
     if args.data_path == 'local':
         data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
     elif args.data_path == 'server':
-        data_path = '/home/cchoi/val/val'
+        data_path = '/home/cchoi/Thesis_data/data/val'
         
     testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.01 : 500
