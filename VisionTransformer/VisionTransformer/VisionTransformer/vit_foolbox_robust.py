@@ -1,4 +1,5 @@
 #Server
+# git stash
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate thesis
 # python vit_foolbox_robust.py --model_name swin_base --attack_name FGSM --batch_size 8 --data_divide 100 --data_path server
