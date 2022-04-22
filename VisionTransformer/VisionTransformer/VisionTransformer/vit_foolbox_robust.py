@@ -156,7 +156,8 @@ if __name__ == '__main__':
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
         for eps, acc in zip(epsilons, robust_accuracy):
-            print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")    
+            print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")  
+        plt.figure(figsize=(5,5))
         plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
         plt.show()
         
@@ -182,6 +183,7 @@ if __name__ == '__main__':
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
         #robust_accuracy
+        plt.figure(figsize=(5,5))
         plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
         plt.show()
         for eps, acc in zip(epsilons, robust_accuracy):
@@ -210,7 +212,8 @@ if __name__ == '__main__':
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
         for eps, acc in zip(epsilons, robust_accuracy):
-            print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")    
+            print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   
+        plt.figure(figsize=(5,5))
         plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
         plt.show()
           
@@ -331,6 +334,13 @@ if __name__ == '__main__':
  ## Linf norm ≤ 0.001176470588235294: 44.8 %     ViT > EfficientNet
   #Linf norm ≤ 0.00392156862745098:  7.5 %       EfficientNet > ViT
   #Linf norm ≤ 0.011764705882352941:  0.4 %      EfficientNet > ViT
+  
+#robust accuracy for perturbations with
+ # Linf norm ≤ 0     : 88.6 %
+  #Linf norm ≤ 0.0003921568627450981: 78.1 %
+  #Linf norm ≤ 0.001176470588235294: 56.7 %
+  #Linf norm ≤ 0.00392156862745098: 12.5 %
+  #Linf norm ≤ 0.01568627450980392:  0.0 %
 
 "PGD: DeiT"
 ##  Linf norm ≤ 0     : 79.8 %
