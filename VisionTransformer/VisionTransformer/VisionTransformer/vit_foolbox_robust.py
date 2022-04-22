@@ -2,7 +2,7 @@
 # git stash
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate thesis
-# python vit_foolbox_robust.py --model_name swin_base --attack_name FGSM --batch_size 8 --data_divide 100 --data_path server
+# python vit_foolbox_robust.py --model_name vit --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -46,7 +46,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size',default = 8, type = int)
     parser.add_argument('--data_divide',default = 100, type = int, help = 'multiply by 0.01')  # /100 : 500  args.data_path 
     parser.add_argument('--data_path',default = 'local', type = str) 
-    args = parser.parse_args()
+    args = parser.parse_args()  
     #print(args)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")   ############################################
     #device = "cpu"
@@ -275,44 +275,41 @@ if __name__ == '__main__':
 #   [0.94 0.81 0.69 0.38 0.31 0.12 0.06 0.   0.   0.  ]      
 #%%
 # https://colab.research.google.com/drive/1muZ4QFgVfwALgqmrfOkp7trAvqDemckO?usp=sharing
-                
+"Test: 800 data"
 "FGSM : Resnet"
+#clean accuracy:  68.4 %
 #robust accuracy for perturbations with
-#  Linf norm ≤ 0     : 62.5 %
- # Linf norm ≤ 0.0003921568627450981: 44.8 %
-#  Linf norm ≤ 0.001176470588235294: 20.8 %
-#  Linf norm ≤ 0.00392156862745098:  4.6 %
-#  Linf norm ≤ 0.011764705882352941:  0.0 %
-                
-"FGSM:EfficientNet"
-#  Linf norm ≤ 0     : 72.2 %
- # Linf norm ≤ 0.0003921568627450981: 60.9 %
-  #Linf norm ≤ 0.001176470588235294: 45.6 %
- # Linf norm ≤ 0.00392156862745098: 25.0 %
- # Linf norm ≤ 0.011764705882352941: 16.9 %
-
-"FGSM: ViT - clean_accuracy: 81.2 % "
-#  Linf norm ≤ 0     : 81.0 %
- # Linf norm ≤ 0.0003921568627450981: 69.8 %
-  #Linf norm ≤ 0.001176470588235294: 53.6 %
- # Linf norm ≤ 0.00392156862745098: 33.3 %
- # Linf norm ≤ 0.011764705882352941: 22.0 %
+ # Linf norm ≤ 0     : 68.4 %
+ # Linf norm ≤ 0.0003921568627450981: 50.6 %
+ # Linf norm ≤ 0.001176470588235294: 28.6 %
+#  Linf norm ≤ 0.00392156862745098:  4.2 %
+ # Linf norm ≤ 0.01568627450980392:  0.5 %
  
-# clean accuracy:  83.7 %
+"FGSM:EfficientNet"
 #robust accuracy for perturbations with
-#  Linf norm ≤ 0     : 83.7 %
- # Linf norm ≤ 0.0003921568627450981: 70.8 %
-  #Linf norm ≤ 0.001176470588235294: 53.2 %
-  #Linf norm ≤ 0.00392156862745098: 29.4 %
-  #Linf norm ≤ 0.01568627450980392: 17.7 %
+ # Linf norm ≤ 0     : 80.4 %
+ # Linf norm ≤ 0.0003921568627450981: 70.5 %
+  #Linf norm ≤ 0.001176470588235294: 53.9 %
+  #Linf norm ≤ 0.00392156862745098: 33.8 %
+  #Linf norm ≤ 0.01568627450980392: 24.5 %
+  
+"FGSM: ViT - clean_accuracy: 81.2 % "
+#clean accuracy:  88.6 %
+#robust accuracy for perturbations with
+#  Linf norm ≤ 0     : 88.6 %
+ # Linf norm ≤ 0.0003921568627450981: 78.7 %
+ # Linf norm ≤ 0.001176470588235294: 64.3 %
+ # Linf norm ≤ 0.00392156862745098: 42.0 %
+ # Linf norm ≤ 0.01568627450980392: 26.7 %
 
 "FGSM: DeiT - clean_accuracy: 87.5 %"
 " Training data-efficient image transformers & distillation through attention"
-#  Linf norm ≤ 0     : 79.8 %
-#  Linf norm ≤ 0.0003921568627450981: 68.8 %         
- # Linf norm ≤ 0.001176470588235294: 59.9 %
-  #Linf norm ≤ 0.00392156862745098: 44.4 %
-  #Linf norm ≤ 0.011764705882352941: 34.5 %
+#robust accuracy for perturbations with
+#  Linf norm ≤ 0     : 86.6 %
+ # Linf norm ≤ 0.0003921568627450981: 75.6 %
+  #Linf norm ≤ 0.001176470588235294: 65.8 %
+  #Linf norm ≤ 0.00392156862745098: 55.3 %
+  #Linf norm ≤ 0.01568627450980392: 43.5 %
 #%%  
 "PGD: ResNet"
  # Linf norm ≤ 0     : 62.5 %
