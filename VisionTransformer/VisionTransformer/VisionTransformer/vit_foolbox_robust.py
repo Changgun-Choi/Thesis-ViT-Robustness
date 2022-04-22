@@ -117,7 +117,7 @@ if __name__ == '__main__':
     if args.data_path == 'local':
         data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
     elif args.data_path == 'server':
-        data_path = '/home/cchoi/Thesis_data/val'
+        data_path = '/home/cchoi/val'
         
     testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.01 : 500
@@ -157,7 +157,8 @@ if __name__ == '__main__':
         print("robust accuracy for perturbations with")
         for eps, acc in zip(epsilons, robust_accuracy):
             print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")    
-        plt.plot(epsilons, robust_accuracy.cpu().numpy())  
+        plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
+        plt.show()
         
     elif args.attack_name == 'FGSM':
         attack = fa.FGSM()
@@ -180,9 +181,12 @@ if __name__ == '__main__':
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
+        #robust_accuracy
+        plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
+        plt.show()
         for eps, acc in zip(epsilons, robust_accuracy):
             print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")    
-        plt.plot(epsilons, robust_accuracy.cpu().numpy())  
+         
         
     elif args.attack_name == 'DeepFool': 
         attack = fb.attacks.LinfDeepFoolAttack()
@@ -207,7 +211,9 @@ if __name__ == '__main__':
         print("robust accuracy for perturbations with")
         for eps, acc in zip(epsilons, robust_accuracy):
             print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")    
-        plt.plot(epsilons, robust_accuracy.cpu().numpy())  
+        plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
+        plt.show()
+          
 #%%            
     elif args.attack_name == 'multiple_attacks': 
         attacks = [
@@ -335,7 +341,9 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.001176470588235294: 37.7 %
   #Linf norm ≤ 0.00392156862745098:  6.7 %
   #Linf norm ≤ 0.011764705882352941:  0.2 %
- 
+#%%
+"Deepfool"
+
 "FGSM: DeiT > ViT > EfficientNet > ResNet"  
 "PGD: EfficientNet > ViT > DeiT  > ResNet"
 
