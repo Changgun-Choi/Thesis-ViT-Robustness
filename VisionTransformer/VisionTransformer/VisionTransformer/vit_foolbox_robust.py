@@ -50,58 +50,59 @@ if __name__ == '__main__':
     #print(args)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")   ############################################
     #device = "cpu"
+    with torch.no_grad():
     
-    if args.model_name == 'resnet':
-        model = torchvision.models.resnet18(pretrained=True).eval().to(device)
+        if args.model_name == 'resnet':
+            model = torchvision.models.resnet18(pretrained=True).eval().to(device)
+            
+        elif args.model_name == 'efficient':  
+            model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
         
-    elif args.model_name == 'efficient':  
-        model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
+        elif args.model_name == 'vit':
+            model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)    
+            
+        elif args.model_name == 'deit': 
+            #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
+            def deit_base_patch16_224(pretrained=False, **kwargs):
+                model = VisionTransformer(
+                    patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
+                    norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
+                model.default_cfg = _cfg()
+                if pretrained:
+                    checkpoint = torch.hub.load_state_dict_from_url(
+                        url="https://dl.fbaipublicfiles.com/deit/deit_base_patch16_224-b5f2ef4d.pth",
+                        map_location="cpu", check_hash=True
+                    )
+                    model.load_state_dict(checkpoint["model"])
+                return model
+            model = deit_base_patch16_224(pretrained=True).eval().to(device)  
+       
+        elif args.model_name == 'swin_base':
+            model = timm.create_model('swin_base_patch4_window7_224', pretrained=True).eval().to(device)
+            
+        elif args.model_name == 'swin_path4':
+            model = timm.create_model('swin_s3_base_224', pretrained=True).eval().to(device)
     
-    elif args.model_name == 'vit':
-        model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)    
-        
-    elif args.model_name == 'deit': 
-        #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
-        def deit_base_patch16_224(pretrained=False, **kwargs):
-            model = VisionTransformer(
-                patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
-                norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
-            model.default_cfg = _cfg()
-            if pretrained:
-                checkpoint = torch.hub.load_state_dict_from_url(
-                    url="https://dl.fbaipublicfiles.com/deit/deit_base_patch16_224-b5f2ef4d.pth",
-                    map_location="cpu", check_hash=True
-                )
-                model.load_state_dict(checkpoint["model"])
-            return model
-        model = deit_base_patch16_224(pretrained=True).eval().to(device)  
-   
-    elif args.model_name == 'swin_base':
-        model = timm.create_model('swin_base_patch4_window7_224', pretrained=True).eval().to(device)
-        
-    elif args.model_name == 'swin_path4':
-        model = timm.create_model('swin_s3_base_224', pretrained=True).eval().to(device)
-
-        model = timm.create_model('swin_large_patch4_window7_224', pretrained=True)
-
-        
-        model = timm.create_model('swin_large_patch4_window12_384_in22k', in_chans = 3, pretrained = True,)
-        model = timm.create_model('swin_base_patch4_window7_224_in22k', pretrained=True)
-        from transformers import SwinModel
-        import timm
-        model = SwinModel.from_pretrained("microsoft/swin-tiny-patch4-window7-224")
-        from timm.models import swin_base_patch4_window7_224_in22k
-        timm.list_models(pretrained=True) 
-        timm.list_models('*sw*')
-   
-        
-        
-    elif args.model_name == 'dino_vit':      # clean accuracy:  0.0 %
-        model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16', pretrained=True).eval().to(device)
-        
-    elif args.model_name == 'resnet50_dino':       # clean accuracy:  0.0 %
-        # instantiate a model (could also be a TensorFlow or JAX model)
-        model = torch.hub.load('facebookresearch/dino:main', 'dino_resnet50',pretrained=True).eval().to(device) # eval
+            model = timm.create_model('swin_large_patch4_window7_224', pretrained=True)
+    
+            
+            model = timm.create_model('swin_large_patch4_window12_384_in22k', in_chans = 3, pretrained = True,)
+            model = timm.create_model('swin_base_patch4_window7_224_in22k', pretrained=True)
+            from transformers import SwinModel
+            import timm
+            model = SwinModel.from_pretrained("microsoft/swin-tiny-patch4-window7-224")
+            from timm.models import swin_base_patch4_window7_224_in22k
+            timm.list_models(pretrained=True) 
+            timm.list_models('*sw*')
+       
+            
+            
+        elif args.model_name == 'dino_vit':      # clean accuracy:  0.0 %
+            model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16', pretrained=True).eval().to(device)
+            
+        elif args.model_name == 'resnet50_dino':       # clean accuracy:  0.0 %
+            # instantiate a model (could also be a TensorFlow or JAX model)
+            model = torch.hub.load('facebookresearch/dino:main', 'dino_resnet50',pretrained=True).eval().to(device) # eval
  
     preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
     fmodel = PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
