@@ -6,7 +6,7 @@
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
-#python vit_foolbox_robust.py --model_name resnet --attack_name FGSM --batch_size 8 --data_divide 100 --data_path server
+#python vit_foolbox_robust.py --model_name resnet --attack_name FGSM --batch_size 8 --data_divide 100 
 # nvidia-smi
 """
 A simple example that demonstrates how to run a single attack against
@@ -305,7 +305,7 @@ if __name__ == '__main__':
  # Linf norm ≤ 0.00392156862745098: 42.0 %
  # Linf norm ≤ 0.01568627450980392: 26.7 %
 
-"FGSM: DeiT - clean_accuracy: 87.5 %"
+"FGSM: DeiT - clean_accuracy: 87.5 %"    # Not done
 " Training data-efficient image transformers & distillation through attention"
 #robust accuracy for perturbations with
 #  Linf norm ≤ 0     : 86.6 %
@@ -314,7 +314,7 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.00392156862745098: 55.3 %
   #Linf norm ≤ 0.01568627450980392: 43.5 %
   
-"FGSM: Swin"
+"FGSM: Swin"   "Robust to FGSM" 
 #clean accuracy:  87.6 %
 #robust accuracy for perturbations with
  # Linf norm ≤ 0     : 87.6 %
@@ -336,20 +336,14 @@ if __name__ == '__main__':
 #  Linf norm ≤ 0.00392156862745098: 12.7 %       EfficientNet > ViT
 #  Linf norm ≤ 0.011764705882352941:  0.6 %      EfficientNet > ViT
 
-"PGD: Vit"
-#robust accuracy for perturbations with
- #Linf norm ≤ 0     : 81.0 %
-  #Linf norm ≤ 0.0003921568627450981: 69.0 %     ViT > EfficientNet
- ## Linf norm ≤ 0.001176470588235294: 44.8 %     ViT > EfficientNet
-  #Linf norm ≤ 0.00392156862745098:  7.5 %       EfficientNet > ViT
-  #Linf norm ≤ 0.011764705882352941:  0.4 %      EfficientNet > ViT
+"PGD: Vit"  
   
 #robust accuracy for perturbations with
  # Linf norm ≤ 0     : 88.6 %
-  #Linf norm ≤ 0.0003921568627450981: 78.1 %
-  #Linf norm ≤ 0.001176470588235294: 56.7 %
-  #Linf norm ≤ 0.00392156862745098: 12.5 %
-  #Linf norm ≤ 0.01568627450980392:  0.0 %
+  #Linf norm ≤ 0.0003921568627450981: 78.1 %    ViT > EfficientNet
+  #Linf norm ≤ 0.001176470588235294: 56.7 %     ViT > EfficientNet
+  #Linf norm ≤ 0.00392156862745098: 12.5 %      EfficientNet > ViT
+  #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT
 
 "PGD: DeiT"
 ##  Linf norm ≤ 0     : 79.8 %
@@ -357,6 +351,15 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.001176470588235294: 37.7 %
   #Linf norm ≤ 0.00392156862745098:  6.7 %
   #Linf norm ≤ 0.011764705882352941:  0.2 %
+  
+"PGD: Swin"  "Not robust to PGD attacks"          # 800
+#clean accuracy:  87.6 %
+#robust accuracy for perturbations with
+ # Linf norm ≤ 0     : 87.6 %
+  #Linf norm ≤ 0.0003921568627450981: 60.0 %
+ # Linf norm ≤ 0.001176470588235294: 23.5 %
+  #Linf norm ≤ 0.00392156862745098:  1.1 %
+  #Linf norm ≤ 0.01568627450980392:  0.0 %
 #%%
 "Deepfool"
 
