@@ -279,7 +279,8 @@ if __name__ == '__main__':
 #   [0.94 0.81 0.69 0.38 0.31 0.12 0.06 0.   0.   0.  ]      
 #%%
 # https://colab.research.google.com/drive/1muZ4QFgVfwALgqmrfOkp7trAvqDemckO?usp=sharing
-"Test: 800 data"
+"Test data: 800 dataset"
+
 "FGSM : Resnet"
 #clean accuracy:  68.4 %
 #robust accuracy for perturbations with
@@ -297,7 +298,7 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.00392156862745098: 33.8 %
   #Linf norm ≤ 0.01568627450980392: 24.5 %
   
-"FGSM: ViT - clean_accuracy: 81.2 % "
+"FGSM: ViT  "
 #clean accuracy:  88.6 %
 #robust accuracy for perturbations with
 #  Linf norm ≤ 0     : 88.6 %
@@ -306,7 +307,7 @@ if __name__ == '__main__':
  # Linf norm ≤ 0.00392156862745098: 42.0 %
  # Linf norm ≤ 0.01568627450980392: 26.7 %
 
-"FGSM: DeiT - clean_accuracy: 87.5 %"    # Not done
+"FGSM: DeiT "    # Not done
 " Training data-efficient image transformers & distillation through attention"
 #robust accuracy for perturbations with
 #  Linf norm ≤ 0     : 86.6 %
@@ -338,7 +339,6 @@ if __name__ == '__main__':
 #  Linf norm ≤ 0.011764705882352941:  0.6 %      EfficientNet > ViT
 
 "PGD: Vit"  
-  
 #robust accuracy for perturbations with
  # Linf norm ≤ 0     : 88.6 %
   #Linf norm ≤ 0.0003921568627450981: 78.1 %    ViT > EfficientNet
@@ -364,6 +364,13 @@ if __name__ == '__main__':
 #%%
 "Deepfool"
 
-"FGSM: DeiT > ViT > EfficientNet > ResNet"  
-"PGD: EfficientNet > ViT > DeiT  > ResNet"
+"FGSM: Swin > DeiT > ViT > EfficientNet > ResNet"  
+"PGD: EfficientNet > ViT > DeiT  > Swin > ResNet"
+
+"1. ViT models are robust on FGSM attacks but not on PGD attacks(multiple)"
+"2. "
+
+Future: Look at frequency analysis of CNNs and ViT
+
+
 
