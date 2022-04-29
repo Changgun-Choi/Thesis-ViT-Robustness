@@ -152,7 +152,7 @@ if __name__ == '__main__':
             accuracy += clean_acc
             #print(success)
         accuracy = accuracy / len(val_loader)
-        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+        #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
@@ -179,7 +179,7 @@ if __name__ == '__main__':
             accuracy += clean_acc
             #print(success)
         accuracy = accuracy / len(val_loader)
-        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+        #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
@@ -208,7 +208,7 @@ if __name__ == '__main__':
             accuracy += clean_acc
             #print(success)
         accuracy = accuracy / len(val_loader)
-        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+        #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
@@ -307,7 +307,7 @@ if __name__ == '__main__':
  # Linf norm ≤ 0.00392156862745098: 42.0 %
  # Linf norm ≤ 0.01568627450980392: 26.7 %
 
-"FGSM: DeiT "    # Not done
+"FGSM: DeiT "    
 " Training data-efficient image transformers & distillation through attention"
 #robust accuracy for perturbations with
 #  Linf norm ≤ 0     : 86.6 %
@@ -315,7 +315,7 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.001176470588235294: 65.8 %
   #Linf norm ≤ 0.00392156862745098: 55.3 %
   #Linf norm ≤ 0.01568627450980392: 43.5 %
-  
+    
 "FGSM: Swin"   "Robust to FGSM" 
 #clean accuracy:  87.6 %
 #robust accuracy for perturbations with
@@ -361,6 +361,16 @@ if __name__ == '__main__':
  # Linf norm ≤ 0.001176470588235294: 23.5 %
   #Linf norm ≤ 0.00392156862745098:  1.1 %
   #Linf norm ≤ 0.01568627450980392:  0.0 %
+#%%
+"Fool_attack: ViT"
+
+#robust accuracy for perturbations with
+ # Linf norm ≤ 0     : 86.6 %
+ # Linf norm ≤ 0.0003921568627450981: 64.6 %
+ # Linf norm ≤ 0.001176470588235294: 24.1 %
+#  Linf norm ≤ 0.00392156862745098:  1.0 %
+ # Linf norm ≤ 0.01568627450980392:  0.0 %
+
 #%%
 "Test data: 800 test dataset, 5 Models tested "
 
