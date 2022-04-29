@@ -368,29 +368,29 @@ if __name__ == '__main__':
 "PGD: EfficientNet > ViT > DeiT  > Swin > ResNet"
 
 
-1. ViT models are robust on FGSM attacks but not on PGD attacks compared to EfficientNet.
-   PGD: Multiple steps with learning rate
-  -> Multiple steps of Gradient attacks affects Robustness of Transformer?
-  ex. eclude 
+#1. ViT models are robust on FGSM attacks but not on PGD attacks compared to EfficientNet.
+#   PGD: Multiple steps with learning rate
+#  -> Multiple steps of Gradient attacks affects Robustness of Transformer?
+#  ex. eclude 
   
-2. Hybrid of shifted windows ViT (Swin Transformer) is less robust than ViTs, EfficientNet in terms of PGD
-  -> Improve clean accuracy but hurt adversarial robustness
-  possible reason -> shifted windows limiting self-attention computation harms Robustness?
-   
-3. Feautre learned by ViT would be more generalizable and robust to perturabtion? 
+#2. Hybrid of shifted windows ViT (Swin Transformer) is less robust than ViTs, EfficientNet in terms of PGD
+#  -> Improve clean accuracy but hurt adversarial robustness
+#  possible reason -> shifted windows limiting self-attention computation harms Robustness?
+#   
+#3. Feautre learned by ViT would be more generalizable and robust to perturabtion? 
 
 
-Future work: 
-1. Look at frequency analysis of features -> How does learning low-level features affects robustness? 
-   -> Literature or library? 
-2. How model size affects Clean Accuracy and Robustness?  ex. CNNs influences compare them 
-3. ViT + ResNet(CNNs) : Combining them
-  How Convolution layer affects ViT robustness? 
-  or Increasing the Transformer Blocks improve robustness? 
+#Future work: 
+#1. Look at frequency analysis of features -> How does learning low-level features affects robustness? 
+#   -> Literature or library? 
+#2. How model size affects Clean Accuracy and Robustness?  ex. CNNs influences compare them 
+#3. ViT + ResNet(CNNs) : Combining them
+#  How Convolution layer affects ViT robustness? 
+#  or Increasing the Transformer Blocks improve robustness? 
 
-Q.
-1. Parameters of PGD??? ex. step sizes how affects robustness?
-2. Too small epsilons could affect PGD?
+#Q.
+#1. Parameters of PGD??? ex. step sizes how affects robustness?
+#2. Too small epsilons could affect PGD?
 
 
 
