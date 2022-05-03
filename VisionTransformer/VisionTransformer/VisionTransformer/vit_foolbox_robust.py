@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 return model
             model = deit_base_patch16_224(pretrained=True).eval().to(device)  
        
-        elif args.model_name == 'swin_base':
+        elif args.model_name == 'swin':
             model = timm.create_model('swin_base_patch4_window7_224', pretrained=True).eval().to(device)
             
         elif args.model_name == 'swin_path4':
@@ -362,8 +362,14 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.00392156862745098:  1.1 %
   #Linf norm ≤ 0.01568627450980392:  0.0 %
 #%%
+"Fool_attack: resnet"
+#Linf norm ≤ 0     : 68.4 %
+#  Linf norm ≤ 0.0003921568627450981: 48.4 %
+ # Linf norm ≤ 0.001176470588235294: 22.2 %
+  #Linf norm ≤ 0.00392156862745098:  0.4 %
+  #Linf norm ≤ 0.01568627450980392:  0.0 %
 
-"Efficient"
+"Fool_attack: Efficient"
 #robust accuracy for perturbations with
  # Linf norm ≤ 0     : 80.4 %
   #Linf norm ≤ 0.0003921568627450981: 69.2 %
@@ -387,8 +393,7 @@ if __name__ == '__main__':
  # Linf norm ≤ 0.01568627450980392:  0.0 %
 
 
-
-"ViT > DeiT"
+"ViT > Efficient > DeiT > ResNet"
 
 
 #%%
