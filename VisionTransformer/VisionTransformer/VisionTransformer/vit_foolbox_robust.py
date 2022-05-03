@@ -392,8 +392,14 @@ if __name__ == '__main__':
 #  Linf norm ≤ 0.00392156862745098:  1.0 %
  # Linf norm ≤ 0.01568627450980392:  0.0 %
 
+"Fool_attack: Swin"
+#Linf norm ≤ 0     : 87.6 %
+ # Linf norm ≤ 0.0003921568627450981: 42.4 %
+  #Linf norm ≤ 0.001176470588235294:  5.3 %
+#  Linf norm ≤ 0.00392156862745098:  0.0 %
+  #Linf norm ≤ 0.01568627450980392:  0.0 %
 
-"ViT > Efficient > DeiT > ResNet"
+"ViT > Efficient > DeiT > ResNet > Swin"
 
 
 #%%
@@ -401,6 +407,7 @@ if __name__ == '__main__':
 
 "FGSM: Swin > DeiT > ViT > EfficientNet > ResNet"  
 "PGD: EfficientNet > ViT > DeiT  > Swin > ResNet"
+"DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
 
 
 #1. ViT models are robust on FGSM attacks but not on PGD attacks compared to EfficientNet.
