@@ -326,11 +326,11 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.01568627450980392: 60.9 %
 #%%  
 "PGD: ResNet"
- # Linf norm ≤ 0     : 62.5 %
- # Linf norm ≤ 0.0003921568627450981: 44.8 %
- # Linf norm ≤ 0.001176470588235294: 17.9 %
- # Linf norm ≤ 0.00392156862745098:  0.4 %
- # Linf norm ≤ 0.011764705882352941:  0.0 %
+ # Linf norm ≤ 0     : 68.4 %
+  #Linf norm ≤ 0.0003921568627450981: 51.0 %
+  #Linf norm ≤ 0.001176470588235294: 24.1 %
+  #Linf norm ≤ 0.00392156862745098:  0.4 %
+  #Linf norm ≤ 0.01568627450980392:  0.0 %
 "PGD: EfficientNet"
 #  Linf norm ≤ 0     : 72.2 %
 #  Linf norm ≤ 0.0003921568627450981: 61.3 %     ViT > EfficientNet
@@ -362,14 +362,34 @@ if __name__ == '__main__':
   #Linf norm ≤ 0.00392156862745098:  1.1 %
   #Linf norm ≤ 0.01568627450980392:  0.0 %
 #%%
-"Fool_attack: ViT"
 
+"Efficient"
+#robust accuracy for perturbations with
+ # Linf norm ≤ 0     : 80.4 %
+  #Linf norm ≤ 0.0003921568627450981: 69.2 %
+  #Linf norm ≤ 0.001176470588235294: 46.6 %
+  #Linf norm ≤ 0.00392156862745098: 15.3 %
+  #Linf norm ≤ 0.01568627450980392:  1.2 %
+  
+"Fool_attack: ViT"
+#  Linf norm ≤ 0     : 88.6 %
+ # Linf norm ≤ 0.0003921568627450981: 77.7 %
+  #Linf norm ≤ 0.001176470588235294: 59.1 %
+  #Linf norm ≤ 0.00392156862745098: 22.9 %
+  #Linf norm ≤ 0.01568627450980392:  0.4 %
+  
+"Fool_attack: DeiT"
 #robust accuracy for perturbations with
  # Linf norm ≤ 0     : 86.6 %
  # Linf norm ≤ 0.0003921568627450981: 64.6 %
  # Linf norm ≤ 0.001176470588235294: 24.1 %
 #  Linf norm ≤ 0.00392156862745098:  1.0 %
  # Linf norm ≤ 0.01568627450980392:  0.0 %
+
+
+
+"ViT > DeiT"
+
 
 #%%
 "Test data: 800 test dataset, 5 Models tested "
