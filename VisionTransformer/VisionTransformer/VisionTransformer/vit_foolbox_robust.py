@@ -2,11 +2,11 @@
 # git stash
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate thesis
-# python vit_foolbox_robust.py --model_name vit --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server
+# python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change no --steps 40
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
-#python vit_foolbox_robust.py --model_name resnet --attack_name FGSM --batch_size 8 --data_divide 100 
+#python vit_foolbox_robust.py --model_name resnet --attack_name PGD --batch_size 16 --data_divide 100 --PGD_change yes --steps 40 --epsilon 0.001176 
 # nvidia-smi
 """
 A simple example that demonstrates how to run a single attack against
@@ -43,9 +43,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Vision Transformer')
     parser.add_argument('--model_name', default='vit', type=str, help='data name')    
     parser.add_argument('--attack_name', default='LinfPGD', type=str, help='attack name') 
-    parser.add_argument('--batch_size',default = 8, type = int)
-    parser.add_argument('--data_divide',default = 100, type = int, help = 'multiply by 0.01')  # /100 : 500  args.data_path 
+    parser.add_argument('--batch_size',default = 16, type = int)
+    parser.add_argument('--data_divide',default = 10, type = int, help = 'multiply by 0.01')  # /10 : 5000  args.data_path 
     parser.add_argument('--data_path',default = 'local', type = str) 
+    parser.add_argument('--steps',default = '40', type = int) 
+    parser.add_argument('--PGD_change',default = 'no', type = str) 
+    parser.add_argument('--epsilon',default =  0.001176, type = float)  # 0.3/255
+
     args = parser.parse_args()  
     #print(args)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")   ############################################
@@ -112,8 +116,9 @@ if __name__ == '__main__':
         transforms.ToTensor(),
         #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])    
-    epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
-    #epsilons = [0, 0.1/255] 
+    
+    #epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  # Maximum perturbation
+    epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255, 4/255]  # 0.5/255, 0.8/255
     
     if args.data_path == 'local':
         data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
@@ -135,23 +140,38 @@ if __name__ == '__main__':
     #images, labels = ep.astensors(*samples(fmodel, dataset="imagenet", batchsize=8))  # samples() has only 20 samples and repeats itself if batchsize > 20
     #clean_acc = accuracy(fmodel, images, labels)
        
-    if args.attack_name == 'PGD':  # single adversarial attack (Linf PGD)
-        attack = LinfPGD()
+    if args.attack_name == 'PGD':  # FGSM을 step 단위로 나눠서 사용하는 방식의 공격
+        "default settinig for steps"
+        if args.PGD_change == 'no': 
+            attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
+            
+        else: 
+            #stepsize = [i/4 for i in eps] 
+            epsilons = [args.epsilon]  # list
+            stepsize = args.epsilon/4  # learning rate
+            steps= args.steps  
+            attack = LinfPGD(rel_stepsize=0.033, abs_stepsize=stepsize, steps=steps, random_start=True) # Whether the perturbation is initialized randomly 
+            # abs_stepsize: If given, it takes precedence over rel_stepsize
+            # rel_stepsize: Stepsize relative to epsilon
+        
         accuracy = 0 
         success = torch.zeros(len(epsilons),args.batch_size).cuda()
+        
         for batch_idx, (image, label) in enumerate(val_loader):
             print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
             images = image.cuda()
             labels = label.cuda()
             #images, labels = ep.astensors(images, labels)
-            clean_acc = get_acc(fmodel, images, labels)
-            raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)         
+            #clean_acc = get_acc(fmodel, images, labels)
+            "attack"
+            raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)    
+        
             succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
             #print(succ)
             success += succ
-            accuracy += clean_acc
+            #accuracy += clean_acc
             #print(success)
-        accuracy = accuracy / len(val_loader)
+        #accuracy = accuracy / len(val_loader)
         #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
@@ -162,6 +182,7 @@ if __name__ == '__main__':
         plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
         plt.show()
         
+            
     elif args.attack_name == 'FGSM':
         attack = fa.FGSM()
         accuracy = 0 
@@ -192,6 +213,7 @@ if __name__ == '__main__':
          
         
     elif args.attack_name == 'DeepFool': 
+        "steps=50"
         attack = fb.attacks.LinfDeepFoolAttack()
         accuracy = 0 
         success = torch.zeros(len(epsilons),args.batch_size).cuda()
@@ -405,8 +427,8 @@ if __name__ == '__main__':
 #%%
 "Test data: 800 test dataset, 5 Models tested "
 
-"FGSM: Swin > DeiT > ViT > EfficientNet > ResNet"  
-"PGD: EfficientNet > ViT > DeiT  > Swin > ResNet"
+"FGSM:     Swin > DeiT > ViT > EfficientNet > ResNet"  
+"PGD:      EfficientNet > ViT > DeiT  > Swin > ResNet"
 "DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
 
 
@@ -430,9 +452,16 @@ if __name__ == '__main__':
 #  How Convolution layer affects ViT robustness? 
 #  or Increasing the Transformer Blocks improve robustness? 
 
-#Q.
-#1. Parameters of PGD??? ex. step sizes how affects robustness?
-#2. Too small epsilons could affect PGD?
+"Q1. Parameters of PGD - How the number of steps affects robustness?"
+# Steps are hyperparameter to experiment but how do we fix (step_size and epsilon) in this case?  
+#I looked into examples from different sources but I could not find the reason why they divide epsilon by 4 or 8 or 10. No experiment to decide step_size. 
+#1) ex. step_size = eps/4,     steps = 20
+#2) ex. step_size=eps/8 :      attack = torchattacks.PGD(model, eps=8/255, step_size=eps/8, steps=40, random_start=True)
+#3) ex. step_size = eps/10 :   pgd = fb.attacks.PGD(abs_stepsize=epsilons/10, steps=40)
+
+
+"2. Too small epsilons could affect PGD?"
+#Try smaller epsilons"
 
 
 
