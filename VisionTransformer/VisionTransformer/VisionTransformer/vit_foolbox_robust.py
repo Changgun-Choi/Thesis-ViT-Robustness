@@ -2,7 +2,7 @@
 # git stash
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate thesis
-# python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change no --steps 40
+# python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change yes --stepsize 4
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -46,9 +46,9 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size',default = 16, type = int)
     parser.add_argument('--data_divide',default = 10, type = int, help = 'multiply by 0.01')  # /10 : 5000  args.data_path 
     parser.add_argument('--data_path',default = 'local', type = str) 
-    parser.add_argument('--steps',default = '40', type = int) 
+    parser.add_argument('--stepsize',default = '4', type = int) # /4, 8, 12
     parser.add_argument('--PGD_change',default = 'no', type = str) 
-    parser.add_argument('--epsilon',default =  0.001176, type = float)  # 0.3/255
+    #parser.add_argument('--epsilon',default =  0.001176, type = float)  # 0.3/255
 
     args = parser.parse_args()  
     #print(args)
@@ -117,8 +117,8 @@ if __name__ == '__main__':
         #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])    
     
-    #epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  # Maximum perturbation
-    epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255, 4/255]  # 0.5/255, 0.8/255
+    epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  # Maximum perturbation
+    #epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255, 4/255]  # 0.5/255, 0.8/255
     
     if args.data_path == 'local':
         data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
@@ -146,41 +146,42 @@ if __name__ == '__main__':
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
             
         else: 
+            "Different step_size"
+            "defaults to 0.01 / 0.3"
+            0.01/0.3
+            (0.3/255)/12
             #stepsize = [i/4 for i in eps] 
-            epsilons = [args.epsilon]  # list
-            stepsize = args.epsilon/4  # learning rate
-            steps= args.steps  
-            attack = LinfPGD(rel_stepsize=0.033, abs_stepsize=stepsize, steps=steps, random_start=True) # Whether the perturbation is initialized randomly 
-            # abs_stepsize: If given, it takes precedence over rel_stepsize
-            # rel_stepsize: Stepsize relative to epsilon
-        
-        accuracy = 0 
-        success = torch.zeros(len(epsilons),args.batch_size).cuda()
-        
-        for batch_idx, (image, label) in enumerate(val_loader):
-            print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
-            images = image.cuda()
-            labels = label.cuda()
-            #images, labels = ep.astensors(images, labels)
-            #clean_acc = get_acc(fmodel, images, labels)
-            "attack"
-            raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)    
-        
-            succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
-            #print(succ)
-            success += succ
-            #accuracy += clean_acc
-            #print(success)
-        #accuracy = accuracy / len(val_loader)
-        #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
-        success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
-        robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
-        print("robust accuracy for perturbations with")
-        for eps, acc in zip(epsilons, robust_accuracy):
-            print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")  
-        plt.figure(figsize=(5,5))
-        plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
-        plt.show()
+            #epsilons = [args.epsilon]  # list
+            epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
+            
+            r_success = torch.zeros(len(epsilons),args.batch_size).cuda()
+            for batch_idx, (image, label) in enumerate(val_loader):
+                print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
+                success = torch.zeros(len(epsilons),args.batch_size).cuda()
+                for i, eps in enumerate(epsilons):
+                    stepsize = eps/args.stepsize # learning rate
+                    attack = LinfPGD(rel_stepsize=0.033, abs_stepsize=stepsize, steps=40, random_start=True) # Whether the perturbation is initialized randomly 
+                           # abs_stepsize: If given, it takes precedence over rel_stepsize, # rel_stepsize: Stepsize relative to epsilon
+                    images = image.cuda()
+                    labels = label.cuda() 
+                    #images, labels = ep.astensors(images, labels)
+                    #clean_acc = get_acc(fmodel, images, labels)
+                    "attack"
+                    raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=eps)    
+                    print(succ)
+                    success[i] = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
+                    print(success)
+                r_success += success
+                print(r_success)
+                
+            r_success = r_success/len(val_loader)            #  # succes of Attack (lowering accuracy)
+            robust_accuracy = 1 - r_success.mean(dim = -1)     # t.mean(dim=1): Mean of last dimension (different with other dim)
+            print("robust accuracy for perturbations with")
+            for eps, acc in zip(epsilons, robust_accuracy):
+                print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")  
+            plt.figure(figsize=(5,5))
+            plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
+            plt.show()  
         
             
     elif args.attack_name == 'FGSM':
@@ -426,42 +427,66 @@ if __name__ == '__main__':
 
 #%%
 "Test data: 800 test dataset, 5 Models tested "
-
+# Adversarial attack: maximizing the inner optimization problem
 "FGSM:     Swin > DeiT > ViT > EfficientNet > ResNet"  
-"PGD:      EfficientNet > ViT > DeiT  > Swin > ResNet"
+"PGD:      EfficientNet > ViT > DeiT > Swin > ResNet"
 "DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
+# minimal perturbation to fool
+# https://velog.io/@wilko97/%EB%85%BC%EB%AC%B8%EB%A6%AC%EB%B7%B0-DeepFool-a-simple-and-accurate-method-to-fool-deep-neural-networks-CVPR-2016
 
-
-#1. ViT models are robust on FGSM attacks but not on PGD attacks compared to EfficientNet.
+"1. ViT models are robust on FGSM attacks but not on PGD(stronger attack) compared to EfficientNet"
 #   PGD: Multiple steps with learning rate
 #  -> Multiple steps of Gradient attacks affects Robustness of Transformer?
-#  ex. eclude 
+#  ex. exclude shifted layer??
   
-#2. Hybrid of shifted windows ViT (Swin Transformer) is less robust than ViTs, EfficientNet in terms of PGD
-#  -> Improve clean accuracy but hurt adversarial robustness
-#  possible reason -> shifted windows limiting self-attention computation harms Robustness?
-#   
-#3. Feautre learned by ViT would be more generalizable and robust to perturabtion? 
 
+#  Shifted windows -> Improve clean accuracy but hurt adversarial robustness
+"possible reason: shifted windows limiting self-attention computation harms Robustness"
+
+"3. Feautre learned by ViT would be more generalizable and robust to perturabtion of FGSM, DeepFool not PGD" 
 
 #Future work: 
 #1. Look at frequency analysis of features -> How does learning low-level features affects robustness? 
 #   -> Literature or library? 
-#2. How model size affects Clean Accuracy and Robustness?  ex. CNNs influences compare them 
+"2. How model size affects Clean Accuracy and Robustness?  ex. CNNs influences compare them"
 #3. ViT + ResNet(CNNs) : Combining them
 #  How Convolution layer affects ViT robustness? 
 #  or Increasing the Transformer Blocks improve robustness? 
 
-"Q1. Parameters of PGD - How the number of steps affects robustness?"
+"FGSM:     Swin > DeiT > ViT > EfficientNet > ResNet"  
+"PGD:      EfficientNet > ViT > DeiT > Swin > ResNet"
+"DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
+
+"PGD, DeepFool: Swin(shifted window), DeiT(efficient) is less robust than ViTs, EfficientNet"
+#-> shifted windows which limits self-attention computation could harm Robustness?
+#-> Distillation token could harm Robustness? 
+
+"Q1. Parameters of PGD - How do steps, step_size affects robustness?"  # AutoATttack
 # Steps are hyperparameter to experiment but how do we fix (step_size and epsilon) in this case?  
-#I looked into examples from different sources but I could not find the reason why they divide epsilon by 4 or 8 or 10. No experiment to decide step_size. 
-#1) ex. step_size = eps/4,     steps = 20
-#2) ex. step_size=eps/8 :      attack = torchattacks.PGD(model, eps=8/255, step_size=eps/8, steps=40, random_start=True)
-#3) ex. step_size = eps/10 :   pgd = fb.attacks.PGD(abs_stepsize=epsilons/10, steps=40)
+# I looked into examples from different sources but I could not find the reason why they divide epsilon by 4 or 8 or 10. 
+#1) ex. step_size = eps/4,     steps = 40
+#2) ex. step_size=  eps/8 :    attack = torchattacks.PGD(model, eps=8/255, step_size=eps/8, steps=40, random_start=True)
+#3) ex. step_size = eps/12 :   pgd = fb.attacks.PGD(abs_stepsize=epsilons/10, steps=40)
+
+#Since the step size α is on the same scale as the total perturbation bound ϵ
+# it makes sense to choose α to be some reasonably small fraction of ϵ, 
+# and then choose the number of iterations to be a small multiple of ϵ/α => ex. 4, 8, 10 multiply
+
+"Q2. Too small epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
+#Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
+#Try smaller epsilons compared to those?" -> 0.5/255, 0.8/255???
 
 
-"2. Too small epsilons could affect PGD?"
-#Try smaller epsilons"
+"Q3. How to analyze why result of Deepfool?"
+
+"Future work: ViT + ResNet(CNNs) - Robustness "
+# Q1. How Convolution layer affects ViT robustness? 
+# Q2. Increasing the Transformer Blocks improve robustness? "
+
+#=================================================
+"New_Q. Evaluate confidence of Rob"
+#- ex. 0.5- dog, 0.3 - cat   --> CNN is confident 99%  
+#PGD: ex. confident on wrong prediction. 
 
 
 
