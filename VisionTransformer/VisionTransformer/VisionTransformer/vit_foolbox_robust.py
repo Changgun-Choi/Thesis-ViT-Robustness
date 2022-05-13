@@ -148,8 +148,6 @@ if __name__ == '__main__':
         else: 
             "Different step_size"
             "defaults to 0.01 / 0.3"
-            0.01/0.3
-            (0.3/255)/12
             #stepsize = [i/4 for i in eps] 
             #epsilons = [args.epsilon]  # list
             epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
@@ -168,11 +166,11 @@ if __name__ == '__main__':
                     #clean_acc = get_acc(fmodel, images, labels)
                     "attack"
                     raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=eps)    
-                    print(succ)
+                    #print(succ)
                     success[i] = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
-                    print(success)
+                    #print(success)
                 r_success += success
-                print(r_success)
+                #print(r_success)
                 
             r_success = r_success/len(val_loader)            #  # succes of Attack (lowering accuracy)
             robust_accuracy = 1 - r_success.mean(dim = -1)     # t.mean(dim=1): Mean of last dimension (different with other dim)
