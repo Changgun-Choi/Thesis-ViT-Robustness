@@ -2,7 +2,7 @@
 # git stash
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate thesis
-# python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change yes --stepsize 4
+# python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change yes --stepsize 4
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -459,17 +459,80 @@ if __name__ == '__main__':
 #-> shifted windows which limits self-attention computation could harm Robustness?
 #-> Distillation token could harm Robustness? 
 
+#%%
 "Q1. Parameters of PGD - How do steps, step_size affects robustness?"  # AutoATttack
 # Steps are hyperparameter to experiment but how do we fix (step_size and epsilon) in this case?  
-# I looked into examples from different sources but I could not find the reason why they divide epsilon by 4 or 8 or 10. 
-#1) ex. step_size = eps/4,     steps = 40
-#2) ex. step_size=  eps/8 :    attack = torchattacks.PGD(model, eps=8/255, step_size=eps/8, steps=40, random_start=True)
-#3) ex. step_size = eps/12 :   pgd = fb.attacks.PGD(abs_stepsize=epsilons/10, steps=40)
-
 #Since the step size α is on the same scale as the total perturbation bound ϵ
 # it makes sense to choose α to be some reasonably small fraction of ϵ, 
 # and then choose the number of iterations to be a small multiple of ϵ/α => ex. 4, 8, 10 multiply
 
+"Origianl-PGD: Vit"  
+#robust accuracy for perturbations with
+ # Linf norm ≤ 0     : 88.6 %
+  #Linf norm ≤ 0.0003921568627450981: 78.1 %    ViT > EfficientNet
+  #Linf norm ≤ 0.001176470588235294: 56.7 %     ViT > EfficientNet
+  #Linf norm ≤ 0.00392156862745098: 12.5 %      EfficientNet > ViT
+  #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT0 %
+1. step_size = eps/4
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 88.6 %
+  Linf norm ≤ 0.0003921568627450981: 76.2 %
+  Linf norm ≤ 0.001176470588235294: 46.2 %
+  Linf norm ≤ 0.00392156862745098:  3.2 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+2. step_size=  eps/8 
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 88.6 %
+  Linf norm ≤ 0.0003921568627450981: 76.0 %
+  Linf norm ≤ 0.001176470588235294: 46.7 %
+  Linf norm ≤ 0.00392156862745098:  4.0 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+3. step_size = eps/12
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 88.6 %
+  Linf norm ≤ 0.0003921568627450981: 75.9 %
+  Linf norm ≤ 0.001176470588235294: 48.0 %
+  Linf norm ≤ 0.00392156862745098:  4.7 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+  
+###############################################################################
+"PGD: EfficientNet"
+#  Linf norm ≤ 0     : 72.2 %
+#  Linf norm ≤ 0.0003921568627450981: 61.3 %     ViT > EfficientNet
+#  Linf norm ≤ 0.001176470588235294: 43.8 %      ViT > EfficientNet
+#  Linf norm ≤ 0.00392156862745098: 12.7 %       EfficientNet > ViT
+#  Linf norm ≤ 0.011764705882352941:  0.6 %      EfficientNet > ViT
+
+1. step_size = eps/4
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 80.4 %
+  Linf norm ≤ 0.0003921568627450981: 70.2 %
+  Linf norm ≤ 0.001176470588235294: 46.0 %
+  Linf norm ≤ 0.00392156862745098:  9.7 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+2. step_size=  eps/8 
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 80.4 %
+  Linf norm ≤ 0.0003921568627450981: 70.3 %
+  Linf norm ≤ 0.001176470588235294: 46.6 %
+  Linf norm ≤ 0.00392156862745098: 10.8 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+3. step_size = eps/12  
+  Linf norm ≤ 0     : 80.4 %
+  Linf norm ≤ 0.0003921568627450981: 70.3 %
+  Linf norm ≤ 0.001176470588235294: 47.1 %
+  Linf norm ≤ 0.00392156862745098: 12.5 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+  
+"PGD Insight(3 different step_size): Efficient is more robust than ViT when epsilon is larger than 1/255 "
+# [0.1/255, 0.3/255, 1/255, 4/255] 
+
+# 0.1/255    ViT > EfficientNet
+# 0.3/255    ViT > EfficientNet
+# 1/255      EfficientNet > ViT
+# 4/255      EfficientNet > ViT
+
+#%%
 "Q2. Too small epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
 #Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
 #Try smaller epsilons compared to those?" -> 0.5/255, 0.8/255???
