@@ -216,6 +216,7 @@ if __name__ == '__main__':
         
     elif args.attack_name == 'DeepFool': 
         "steps=50"
+        
         attack = fb.attacks.LinfDeepFoolAttack()
         accuracy = 0 
         success = torch.zeros(len(epsilons),args.batch_size).cuda()
