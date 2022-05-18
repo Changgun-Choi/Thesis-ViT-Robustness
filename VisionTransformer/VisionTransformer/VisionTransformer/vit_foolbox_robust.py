@@ -1,5 +1,6 @@
 #Server
 # git stash
+# git pull
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate thesis
 # python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change yes --stepsize 4
@@ -149,14 +150,37 @@ if __name__ == '__main__':
         "default settinig for steps"
         if args.PGD_change == 'no': 
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
-            
+            accuracy = 0 
+            success = torch.zeros(len(epsilons),args.batch_size).cuda()
+            for batch_idx, (image, label) in enumerate(val_loader):
+                print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
+                images = image.cuda()
+                labels = label.cuda()
+                #images, labels = ep.astensors(images, labels)
+                clean_acc = get_acc(fmodel, images, labels)
+                raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)         
+                succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
+                #print(succ)
+                success += succ
+                accuracy += clean_acc
+                #print(success)
+            accuracy = accuracy / len(val_loader)
+            print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+            success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
+            robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
+            print("robust accuracy for perturbations with")
+            for eps, acc in zip(epsilons, robust_accuracy):
+                print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   
+            plt.figure(figsize=(5,5))
+            plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
+            plt.show()
         else: 
             "Different step_size"
             "defaults to 0.01 / 0.3"
             #stepsize = [i/4 for i in eps] 
             #epsilons = [args.epsilon]  # list
             epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
-            
+            accuracy = 0 
             r_success = torch.zeros(len(epsilons),args.batch_size).cuda()
             for batch_idx, (image, label) in enumerate(val_loader):
                 print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
