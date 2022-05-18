@@ -26,7 +26,7 @@ Created on Tue May 17 16:14:40 2022
   #Linf norm ≤ 0.00392156862745098: 33.8 %
   #Linf norm ≤ 0.01568627450980392: 24.5 %
   
-"FGSM: ViT  "
+"FGSM: ViT"
 #clean accuracy:  88.6 %
 #robust accuracy for perturbations with
 #  Linf norm ≤ 0     : 88.6 %
@@ -52,6 +52,15 @@ Created on Tue May 17 16:14:40 2022
   #Linf norm ≤ 0.001176470588235294: 74.0 %
   #Linf norm ≤ 0.00392156862745098: 67.4 %
   #Linf norm ≤ 0.01568627450980392: 60.9 %
+  
+"FGSM: ViT + Resnet(CNN)"   model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
+clean accuracy:  60.5 %
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 60.5 %
+  Linf norm ≤ 0.0003921568627450981: 43.7 %
+  Linf norm ≤ 0.001176470588235294: 21.9 %
+  Linf norm ≤ 0.00392156862745098:  3.9 %
+  Linf norm ≤ 0.01568627450980392:  0.4 %
 #%%  
 "PGD: ResNet"
  # Linf norm ≤ 0     : 68.4 %
@@ -231,25 +240,36 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.00392156862745098: 12.5 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
   
-"PGD Insight(3 different step_size): Efficient is more robust than ViT when epsilon is larger than 1/255 "
-# [0.1/255, 0.3/255, 1/255, 4/255] 
+"PGD Insight(3 different step_size): Vit is more robust than EfficientNet is more robust than ViT when epsilon is smaller than 1/255 "
+step_size changeds depending on epsilons
+# [0.1/255, 0.3/255, 0.8/255, 1/255, 4/255]  - eps/4, eps/8, eps/12
 
 # 0.1/255    ViT > EfficientNet
 # 0.3/255    ViT > EfficientNet
 # 1/255      EfficientNet > ViT
 # 4/255      EfficientNet > ViT
 
+
 #%%
 "Q2. Too small epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
 #Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
 #Try smaller epsilons compared to those?" -> 0.5/255, 0.8/255???
 
-
-"Q3. How to analyze why result of Deepfool?"
+"Q3. How to analyze the result of Deepfool?" - Also step_size????
 
 "Future work: ViT + ResNet(CNNs) - Robustness "
-# Q1. How Convolution layer affects ViT robustness? 
-# Q2. Increasing the Transformer Blocks improve robustness? "
+Q1. How Convolution layer affects ViT robustness? 
+  
+"FGSM: ViT + Resnet(CNN)"   model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
+clean accuracy:  60.5 %
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 60.5 %
+  Linf norm ≤ 0.0003921568627450981: 43.7 %
+  Linf norm ≤ 0.001176470588235294: 21.9 %
+  Linf norm ≤ 0.00392156862745098:  3.9 %
+  Linf norm ≤ 0.01568627450980392:  0.4 %
+Q2. Increasing the Transformer Blocks improve robustness? (model size)? 
+: Compare results of ViT and CNNs
 
 #=================================================
 "New_Q. Evaluate confidence of Rob"

@@ -66,8 +66,9 @@ if __name__ == '__main__':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)    
         elif args.model_name == 'vit_resnet50': #   'vit_base_resnet50_224_in21k' 'vit_base_resnet50d_224'
             "Hybrid Vision Transformers "  # https://copyfuture.com/blogs-details/202202211942046011
-            model = timm.create_model('vit_base_resnet50_224_in21k', pretrained=True).eval().to(device)  
-        
+            #model = timm.create_model('vit_base_resnet50_224_in21k', pretrained=True).eval().to(device)  
+            model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
+            
         elif args.model_name == 'deit': 
             #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
             def deit_base_patch16_224(pretrained=False, **kwargs):
@@ -121,6 +122,7 @@ if __name__ == '__main__':
     ])    
     
     epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  # Maximum perturbation
+    epsilons = [0.5/255, 0.8/255]
     #epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255, 4/255]  # 0.5/255, 0.8/255
     
     if args.data_path == 'local':
@@ -203,7 +205,7 @@ if __name__ == '__main__':
             accuracy += clean_acc
             #print(success)
         accuracy = accuracy / len(val_loader)
-        #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
@@ -214,7 +216,7 @@ if __name__ == '__main__':
         plt.show()
          
         
-    elif args.attack_name == 'DeepFool': 
+    elif args.attack_name == 'Deepfool': 
         "steps=50"
         
         attack = fb.attacks.LinfDeepFoolAttack()
@@ -233,7 +235,7 @@ if __name__ == '__main__':
             accuracy += clean_acc
             #print(success)
         accuracy = accuracy / len(val_loader)
-        #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
         success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
         robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
         print("robust accuracy for perturbations with")
