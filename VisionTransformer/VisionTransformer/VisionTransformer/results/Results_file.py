@@ -242,7 +242,10 @@ robust accuracy for perturbations with
   
 "PGD Insight(3 different step_size): Vit is more robust than EfficientNet is more robust than ViT when epsilon is smaller than 1/255 "
 step_size changeds depending on epsilons
-# [0.1/255, 0.3/255, 0.8/255, 1/255, 4/255]  - eps/4, eps/8, eps/12
+step_size (learning rate)???
+1) small : Finding optimum takes time 
+2) Huge  : may skip optimum
+ [0.1/255, 0.3/255, "0.5/255 0.8/255", 1/255, 4/255]  - eps/4, eps/8, eps/12
 
 # 0.1/255    ViT > EfficientNet
 # 0.3/255    ViT > EfficientNet
