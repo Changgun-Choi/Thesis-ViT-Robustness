@@ -45,7 +45,7 @@ Created on Tue May 17 16:14:40 2022
   #Linf norm ≤ 0.01568627450980392: 43.5 %
     
 "FGSM: Swin"   "Robust to FGSM" 
-#clean accuracy:  87.6 %
+clean accuracy:  87.6 %
 #robust accuracy for perturbations with
  # Linf norm ≤ 0     : 87.6 %
   #Linf norm ≤ 0.0003921568627450981: 76.6 %
@@ -54,13 +54,13 @@ Created on Tue May 17 16:14:40 2022
   #Linf norm ≤ 0.01568627450980392: 60.9 %
   
 "FGSM: ViT + Resnet(CNN)"   model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
-clean accuracy:  60.5 %
+clean accuracy:  87.1 %
 robust accuracy for perturbations with
-  Linf norm ≤ 0     : 60.5 %
-  Linf norm ≤ 0.0003921568627450981: 43.7 %
-  Linf norm ≤ 0.001176470588235294: 21.9 %
-  Linf norm ≤ 0.00392156862745098:  3.9 %
-  Linf norm ≤ 0.01568627450980392:  0.4 %
+  Linf norm ≤ 0     : 87.1 %
+  Linf norm ≤ 0.0003921568627450981: 76.6 %
+  Linf norm ≤ 0.001176470588235294: 62.5 %
+  Linf norm ≤ 0.00392156862745098: 46.9 %
+  Linf norm ≤ 0.01568627450980392: 35.3 %
 #%%  
 "PGD: ResNet"
  # Linf norm ≤ 0     : 68.4 %
@@ -142,7 +142,7 @@ robust accuracy for perturbations with
 #%%
 "Test data: 800 test dataset, 5 Models tested "
 # Adversarial attack: maximizing the inner optimization problem
-"FGSM:     Swin > DeiT > ViT > EfficientNet > ResNet"  
+"FGSM:     Swin > DeiT > ViT_Res > ViT > EfficientNet > ResNet"   - Larger epsilon(1/255, 4/255)
 "PGD:      EfficientNet > ViT > DeiT > Swin > ResNet"
 "DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
 # minimal perturbation to fool
@@ -249,6 +249,10 @@ Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0.0031372549019607846: 17.3 %
   Linf norm ≤ 0.00392156862745098: 12.5 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
+##################################################
+"PGD: ViT_Hybrid"
+
+
 
 "Q1. Parameters of PGD - How do steps, step_size affects robustness?" 
 "PGD Insight(3 different step_size): Vit is more robust than EfficientNet is more robust than ViT when epsilon is smaller than 0.5/255 "
@@ -260,7 +264,7 @@ step_size (learning rate)??
 "Q2. Size of epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
 Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
 Try smaller epsilons -> [0.5/255, 0.8/255]
-
+# Accuracy   ViT > Efficient 
 # 0.1/255    ViT > EfficientNet
 # 0.3/255    ViT > EfficientNet
   0.5/255    EfficientNet > ViT
@@ -271,6 +275,13 @@ Try smaller epsilons -> [0.5/255, 0.8/255]
 
 
 #%%
+Question 1: ViT has higher clean accuracy compared to CNNs. In this case, can we say ViT is more robust with smaller epsilons of pertubation?
+  "Accuracy   ViT > Efficient"   88.6 > 80.4
+  0.1/255    ViT > EfficientNet
+  0.3/255    ViT > EfficientNet
+  0.5/255    EfficientNet > ViT
+  0.8/255    EfficientNet > ViT
+
 "Q3. How to analyze the result of Deepfool?" - Also step_size????
 
 "Q5.ex. CNN - Purtubated images(around 200) - Overshoot in the edges like rings - How about ViT ??? "
@@ -288,6 +299,7 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.001176470588235294: 21.9 %
   Linf norm ≤ 0.00392156862745098:  3.9 %
   Linf norm ≤ 0.01568627450980392:  0.4 %
+  
   
 "Q5. Increasing the Transformer Blocks improve robustness? (model size)? 
 : Compare results of ViT and CNNs

@@ -7,7 +7,7 @@
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransforre4mer"
-#python vit_foolbox_robust.py --model_name vit_resnet50 --attack_name FGSM --batch_size 16 --data_divide 10 --PGD_change yes 
+#python vit_foolbox_robust.py --model_name vit_resnet50 --attack_name PGD --batch_size 16 --data_divide 10 --PGD_change yes --stepsize 4
 # nvidia-smi
 """
 A simple example that demonstrates how to run a single attack against
@@ -64,9 +64,10 @@ if __name__ == '__main__':
             #model = timm.create_model('efficientnet_b0', pretrained=True)
             
         elif args.model_name == 'vit':
-            model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)    
-        elif args.model_name == 'ViT_Hybrid': #   'vit_base_resnet50_224_in21k' 'vit_base_resnet50d_224'
-            "Hybrid Vision Transformers "  # https://copyfuture.com/blogs-details/202202211942046011
+            model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
+            
+        elif args.model_name == 'vit_hybrid': #   'vit_base_resnet50_224_in21k' 'vit_base_resnet50d_224'
+            "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py
             #model = timm.create_model('vit_base_resnet50_224_in21k', pretrained=True).eval().to(device)   # ImageNet-21k
             model = timm.create_model('vit_large_r50_s32_224', pretrained=True,num_classes=1000).eval().to(device)
             # vit_base_r50_s16_384
@@ -181,7 +182,7 @@ if __name__ == '__main__':
             #stepsize = [i/4 for i in eps] 
             #epsilons = [args.epsilon]  # list
             epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
-            epsilons = [0.5/255, 0.8/255]
+            #epsilons = [0.5/255, 0.8/255]
             accuracy = 0 
             r_success = torch.zeros(len(epsilons),args.batch_size).cuda()
             for batch_idx, (image, label) in enumerate(val_loader):
