@@ -7,7 +7,7 @@
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransforre4mer"
-#python vit_foolbox_robust.py --model_name vit_resnet50 --attack_name PGD --batch_size 16 --data_divide 10 --PGD_change yes --stepsize 4
+#python vit_foolbox_robust.py --model_name vit_hybrid --attack_name PGD --batch_size 16 --data_divide 10 --PGD_change yes --stepsize 4 --data_path server
 # nvidia-smi
 """
 A simple example that demonstrates how to run a single attack against
