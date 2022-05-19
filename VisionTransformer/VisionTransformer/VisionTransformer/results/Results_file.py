@@ -188,12 +188,14 @@ robust accuracy for perturbations with
   #Linf norm ≤ 0.0003921568627450981: 78.1 %    ViT > EfficientNet
   #Linf norm ≤ 0.001176470588235294: 56.7 %     ViT > EfficientNet
   #Linf norm ≤ 0.00392156862745098: 12.5 %      EfficientNet > ViT
-  #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT0 %
+  #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT
 1. step_size = eps/4
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 88.6 %
   Linf norm ≤ 0.0003921568627450981: 76.2 %
   Linf norm ≤ 0.001176470588235294: 46.2 %
+  Linf norm ≤ 0.00196078431372549: 25.4 %
+  Linf norm ≤ 0.0031372549019607846:  6.6 %
   Linf norm ≤ 0.00392156862745098:  3.2 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 2. step_size=  eps/8 
@@ -201,6 +203,8 @@ robust accuracy for perturbations with
   Linf norm ≤ 0     : 88.6 %
   Linf norm ≤ 0.0003921568627450981: 76.0 %
   Linf norm ≤ 0.001176470588235294: 46.7 %
+  Linf norm ≤ 0.00196078431372549: 25.7 %
+Linf norm ≤ 0.0031372549019607846:  7.7 %
   Linf norm ≤ 0.00392156862745098:  4.0 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 3. step_size = eps/12
@@ -224,6 +228,8 @@ robust accuracy for perturbations with
   Linf norm ≤ 0     : 80.4 %
   Linf norm ≤ 0.0003921568627450981: 70.2 %
   Linf norm ≤ 0.001176470588235294: 46.0 %
+  Linf norm ≤ 0.00196078431372549:  28.4 %
+  Linf norm ≤ 0.0031372549019607846: 13.6 %
   Linf norm ≤ 0.00392156862745098:  9.7 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 2. step_size=  eps/8 
@@ -231,47 +237,59 @@ robust accuracy for perturbations with
   Linf norm ≤ 0     : 80.4 %
   Linf norm ≤ 0.0003921568627450981: 70.3 %
   Linf norm ≤ 0.001176470588235294: 46.6 %
+  Linf norm ≤ 0.00196078431372549: 30.3 %
+Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0.00392156862745098: 10.8 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 3. step_size = eps/12  
   Linf norm ≤ 0     : 80.4 %
   Linf norm ≤ 0.0003921568627450981: 70.3 %
   Linf norm ≤ 0.001176470588235294: 47.1 %
+  Linf norm ≤ 0.00196078431372549: 31.5 %
+  Linf norm ≤ 0.0031372549019607846: 17.3 %
   Linf norm ≤ 0.00392156862745098: 12.5 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
-  
-"PGD Insight(3 different step_size): Vit is more robust than EfficientNet is more robust than ViT when epsilon is smaller than 1/255 "
-step_size changeds depending on epsilons
-step_size (learning rate)???
+
+"Q1. Parameters of PGD - How do steps, step_size affects robustness?" 
+"PGD Insight(3 different step_size): Vit is more robust than EfficientNet is more robust than ViT when epsilon is smaller than 0.5/255 "
+step_size changes depending on epsilons(each epsilon has different step_size) "eps/4, eps/8, eps/12" - 
+step_size (learning rate)??
 1) small : Finding optimum takes time 
 2) Huge  : may skip optimum
- [0.1/255, 0.3/255, "0.5/255 0.8/255", 1/255, 4/255]  - eps/4, eps/8, eps/12
+
+"Q2. Size of epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
+Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
+Try smaller epsilons -> [0.5/255, 0.8/255]
 
 # 0.1/255    ViT > EfficientNet
 # 0.3/255    ViT > EfficientNet
+  0.5/255    EfficientNet > ViT
+  0.8/255    EfficientNet > ViT
 # 1/255      EfficientNet > ViT
 # 4/255      EfficientNet > ViT
 
 
-#%%
-"Q2. Too small epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
-#Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
-#Try smaller epsilons compared to those?" -> 0.5/255, 0.8/255???
 
+#%%
 "Q3. How to analyze the result of Deepfool?" - Also step_size????
 
-"Future work: ViT + ResNet(CNNs) - Robustness "
-Q1. How Convolution layer affects ViT robustness? 
+"Q5.ex. CNN - Purtubated images(around 200) - Overshoot in the edges like rings - How about ViT ??? "
+- Vit_explain(Attention Visualization) - PGD (CNNs vs ViT) 이해하기  
+
+"Q4. ViT + ResNet(CNNs) - Robustness " - How Convolution layer affects ViT robustness? 
   
-"FGSM: ViT + Resnet(CNN)"   model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
-clean accuracy:  60.5 %
+FGSM: ViT + Resnet(CNN): model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
+Accuracy of model is not correct!!!!
+
+clean accuracy:  60.5 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 60.5 %
   Linf norm ≤ 0.0003921568627450981: 43.7 %
   Linf norm ≤ 0.001176470588235294: 21.9 %
   Linf norm ≤ 0.00392156862745098:  3.9 %
   Linf norm ≤ 0.01568627450980392:  0.4 %
-Q2. Increasing the Transformer Blocks improve robustness? (model size)? 
+  
+"Q5. Increasing the Transformer Blocks improve robustness? (model size)? 
 : Compare results of ViT and CNNs
 
 #=================================================

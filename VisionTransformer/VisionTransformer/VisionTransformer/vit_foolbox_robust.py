@@ -67,8 +67,8 @@ if __name__ == '__main__':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)    
         elif args.model_name == 'vit_resnet50': #   'vit_base_resnet50_224_in21k' 'vit_base_resnet50d_224'
             "Hybrid Vision Transformers "  # https://copyfuture.com/blogs-details/202202211942046011
-            #model = timm.create_model('vit_base_resnet50_224_in21k', pretrained=True).eval().to(device)  
-            model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
+            #model = timm.create_model('vit_base_resnet50_224_in21k', pretrained=True).eval().to(device)   # ImageNet-21k
+            model = timm.create_model('vit_base_r50_s16_224', pretrained=True).eval().to(device) 
             
         elif args.model_name == 'deit': 
             #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
