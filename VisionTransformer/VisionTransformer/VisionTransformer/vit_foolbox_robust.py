@@ -3,10 +3,10 @@
 # git pull
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate thesis
-# python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change yes --stepsize 4
+# python vit_foolbox_robust.py --model_name vit_resnet50 --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
-#cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
+#cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransforre4mer"
 #python vit_foolbox_robust.py --model_name vit_resnet50 --attack_name FGSM --batch_size 16 --data_divide 10 --PGD_change yes 
 # nvidia-smi
 """
@@ -65,10 +65,11 @@ if __name__ == '__main__':
             
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)    
-        elif args.model_name == 'vit_resnet50': #   'vit_base_resnet50_224_in21k' 'vit_base_resnet50d_224'
+        elif args.model_name == 'ViT_Hybrid': #   'vit_base_resnet50_224_in21k' 'vit_base_resnet50d_224'
             "Hybrid Vision Transformers "  # https://copyfuture.com/blogs-details/202202211942046011
             #model = timm.create_model('vit_base_resnet50_224_in21k', pretrained=True).eval().to(device)   # ImageNet-21k
-            model = timm.create_model('vit_base_r50_s16_224', pretrained=True).eval().to(device) 
+            model = timm.create_model('vit_large_r50_s32_224', pretrained=True,num_classes=1000).eval().to(device)
+            # vit_base_r50_s16_384
             
         elif args.model_name == 'deit': 
             #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
