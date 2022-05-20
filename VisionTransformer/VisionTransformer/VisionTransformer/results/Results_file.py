@@ -53,7 +53,7 @@ clean accuracy:  87.6 %
   #Linf norm ≤ 0.00392156862745098: 67.4 %
   #Linf norm ≤ 0.01568627450980392: 60.9 %
   
-"FGSM: ViT + Resnet(CNN)"   model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
+"FGSM: ViT + Resnet(CNN)"   model = timm.create_model('vit_base_r50_s16_224', pretrained=True).eval().to(device) 
 clean accuracy:  87.1 %
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 87.1 %
@@ -251,9 +251,27 @@ Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 ##################################################
 "PGD: ViT_Hybrid"
+1. step_size = eps/4
+  Linf norm ≤ 0     : 87.1 %
+  Linf norm ≤ 0.0003921568627450981: 72.2 %
+  Linf norm ≤ 0.001176470588235294: 39.1 %
+  Linf norm ≤ 0.00392156862745098:  2.8 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+2. step_size=  eps/8 
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 87.1 %
+  Linf norm ≤ 0.0003921568627450981: 72.3 %
+  Linf norm ≤ 0.001176470588235294: 40.4 %
+  Linf norm ≤ 0.00392156862745098:  3.1 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+3. step_size = eps/12
+  Linf norm ≤ 0     : 87.1 %
+  Linf norm ≤ 0.0003921568627450981: 72.2 %
+  Linf norm ≤ 0.001176470588235294: 41.8 %
+  Linf norm ≤ 0.00392156862745098:  3.7 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
 
-
-
+#%%
 "Q1. Parameters of PGD - How do steps, step_size affects robustness?" 
 "PGD Insight(3 different step_size): Vit is more robust than EfficientNet is more robust than ViT when epsilon is smaller than 0.5/255 "
 step_size changes depending on epsilons(each epsilon has different step_size) "eps/4, eps/8, eps/12" - 
