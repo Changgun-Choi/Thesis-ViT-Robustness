@@ -182,7 +182,7 @@ if __name__ == '__main__':
             #stepsize = [i/4 for i in eps] 
             #epsilons = [args.epsilon]  # list
             epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
-            #epsilons = [0.5/255, 0.8/255]
+            epsilons = [0.5/255, 0.8/255]
             accuracy = 0 
             r_success = torch.zeros(len(epsilons),args.batch_size).cuda()
             for batch_idx, (image, label) in enumerate(val_loader):
