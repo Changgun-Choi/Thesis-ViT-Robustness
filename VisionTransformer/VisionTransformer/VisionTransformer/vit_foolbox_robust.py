@@ -66,11 +66,10 @@ if __name__ == '__main__':
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
             
-        elif args.model_name == 'vit_hybrid': #   'vit_base_resnet50_224_in21k' 'vit_base_resnet50d_224'
+        elif args.model_name == 'vit_hybrid': #   
             "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py
-            #model = timm.create_model('vit_base_resnet50_224_in21k', pretrained=True).eval().to(device)   # ImageNet-21k
             model = timm.create_model('vit_large_r50_s32_224', pretrained=True,num_classes=1000).eval().to(device)
-            # vit_base_r50_s16_384
+            # vit_base_r50_s16_384  # vit_base_resnet50_384
             
         elif args.model_name == 'deit': 
             #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)

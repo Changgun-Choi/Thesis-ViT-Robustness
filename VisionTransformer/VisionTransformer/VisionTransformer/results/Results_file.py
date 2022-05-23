@@ -255,6 +255,8 @@ Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0     : 87.1 %
   Linf norm ≤ 0.0003921568627450981: 72.2 %
   Linf norm ≤ 0.001176470588235294: 39.1 %
+  Linf norm ≤ 0.00196078431372549: 18.5 %
+ Linf norm ≤ 0.0031372549019607846:  5.1 %
   Linf norm ≤ 0.00392156862745098:  2.8 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 2. step_size=  eps/8 
@@ -262,14 +264,20 @@ robust accuracy for perturbations with
   Linf norm ≤ 0     : 87.1 %
   Linf norm ≤ 0.0003921568627450981: 72.3 %
   Linf norm ≤ 0.001176470588235294: 40.4 %
+  Linf norm ≤ 0.00196078431372549: 19.9 %
+Linf norm ≤ 0.0031372549019607846:  6.1 %
   Linf norm ≤ 0.00392156862745098:  3.1 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 3. step_size = eps/12
   Linf norm ≤ 0     : 87.1 %
   Linf norm ≤ 0.0003921568627450981: 72.2 %
   Linf norm ≤ 0.001176470588235294: 41.8 %
+  Linf norm ≤ 0.00196078431372549: 21.9 %
+ Linf norm ≤ 0.0031372549019607846:  7.5 %
   Linf norm ≤ 0.00392156862745098:  3.7 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
+  
+  
 
 #%%
 "Q1. Parameters of PGD - How do steps, step_size affects robustness?" 
