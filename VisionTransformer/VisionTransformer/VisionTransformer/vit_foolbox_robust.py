@@ -7,7 +7,7 @@
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransforre4mer"
-#python vit_foolbox_robust.py --model_name resnet_50_L --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
+#python vit_foolbox_robust.py --model_name resnet50_L --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
 # nvidia-smi
 """ A simple example that demonstrates how to run a single attack against a PyTorch ResNet-18 model for different epsilons and how to then report
 the robust accuracy """
@@ -54,15 +54,16 @@ if __name__ == '__main__':
     #device = "cpu"
     with torch.no_grad():
         "https://rwightman.github.io/pytorch-image-models/models/vision-transformer/"
-        if args.model_name == 'resnet_18':
+        if args.model_name == 'resnet_18':   # 68.4 %
             model = torchvision.models.resnet18(pretrained=True).eval().to(device)
-        elif args.model_name == 'resnet50_L':
-            model = timm.create_model('swsl_resnet50',  pretrained=True).eval().to(device)
-        
-        elif args.model_name == 'mobilenet3':
-            model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
             
-        elif args.model_name == 'efficient':  
+        elif args.model_name == 'resnet50': # 80.53
+            model = timm.create_model('resnet50',  pretrained=True).eval().to(device)
+          # ResNet50-swsl pre-trained on IG-1B-Targeted (Mahajan et al. (2018)) using semi-weakly supervised methods (Yalniz et al. (2019))
+        #elif args.model_name == 'mobilenet3':
+         #   model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
+            
+        elif args.model_name == 'efficient':  # 72.2 %
             model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
             #model = timm.create_model('efficientnet_b0', pretrained=True)
             

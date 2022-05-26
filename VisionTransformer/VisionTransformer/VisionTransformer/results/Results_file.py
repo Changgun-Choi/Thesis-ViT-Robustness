@@ -68,8 +68,11 @@ robust accuracy for perturbations with
   #Linf norm ≤ 0.001176470588235294: 24.1 %
   #Linf norm ≤ 0.00392156862745098:  0.4 %
   #Linf norm ≤ 0.01568627450980392:  0.0 %
+  
+ 
+  
 "PGD: EfficientNet"
-#  Linf norm ≤ 0     : 72.2 %
+#  Linf norm ≤ 0     : 72.2 %  # 80.4 %
 #  Linf norm ≤ 0.0003921568627450981: 61.3 %     ViT > EfficientNet
 #  Linf norm ≤ 0.001176470588235294: 43.8 %      ViT > EfficientNet
 #  Linf norm ≤ 0.00392156862745098: 12.7 %       EfficientNet > ViT
@@ -185,11 +188,6 @@ robust accuracy for perturbations with
 
 ###############################################################################
 "PGD: EfficientNet"
-#  Linf norm ≤ 0     : 72.2 %
-#  Linf norm ≤ 0.0003921568627450981: 61.3 %     ViT > EfficientNet
-#  Linf norm ≤ 0.001176470588235294: 43.8 %      ViT > EfficientNet
-#  Linf norm ≤ 0.00392156862745098: 12.7 %       EfficientNet > ViT
-#  Linf norm ≤ 0.011764705882352941:  0.6 %      EfficientNet > ViT
 
 1. step_size = eps/4
 robust accuracy for perturbations with
