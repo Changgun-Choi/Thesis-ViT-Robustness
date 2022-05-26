@@ -90,7 +90,7 @@ if __name__ == '__main__':
         
     elif args.model_name == 'deit': # DeiT (Data-Efficient Image Transformers)
         #model = torch.hub.load('facebookresearch/deit:main', 'deit_base_patch16_224', pretrained=True).eval().to(device)        
-        def deit_base_patch16_224(pretrained=False, **kwargs):
+        def deit_base_patch16_224(pretrained=False, **kwargs): 
             model = VisionTransformer(
                 patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
                 norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)

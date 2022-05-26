@@ -182,39 +182,7 @@ robust accuracy for perturbations with
 # it makes sense to choose α to be some reasonably small fraction of ϵ, 
 # and then choose the number of iterations to be a small multiple of ϵ/α => ex. 4, 8, 10 multiply
 
-"Origianl-PGD: Vit"  
-#robust accuracy for perturbations with
- # Linf norm ≤ 0     : 88.6 %
-  #Linf norm ≤ 0.0003921568627450981: 78.1 %    ViT > EfficientNet
-  #Linf norm ≤ 0.001176470588235294: 56.7 %     ViT > EfficientNet
-  #Linf norm ≤ 0.00392156862745098: 12.5 %      EfficientNet > ViT
-  #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT
-1. step_size = eps/4
-robust accuracy for perturbations with
-  Linf norm ≤ 0     : 88.6 %
-  Linf norm ≤ 0.0003921568627450981: 76.2 %
-  Linf norm ≤ 0.001176470588235294: 46.2 %
-  Linf norm ≤ 0.00196078431372549: 25.4 %
-  Linf norm ≤ 0.0031372549019607846:  6.6 %
-  Linf norm ≤ 0.00392156862745098:  3.2 %
-  Linf norm ≤ 0.01568627450980392:  0.0 %
-2. step_size=  eps/8 
-robust accuracy for perturbations with
-  Linf norm ≤ 0     : 88.6 %
-  Linf norm ≤ 0.0003921568627450981: 76.0 %
-  Linf norm ≤ 0.001176470588235294: 46.7 %
-  Linf norm ≤ 0.00196078431372549: 25.7 %
-Linf norm ≤ 0.0031372549019607846:  7.7 %
-  Linf norm ≤ 0.00392156862745098:  4.0 %
-  Linf norm ≤ 0.01568627450980392:  0.0 %
-3. step_size = eps/12
-robust accuracy for perturbations with
-  Linf norm ≤ 0     : 88.6 %
-  Linf norm ≤ 0.0003921568627450981: 75.9 %
-  Linf norm ≤ 0.001176470588235294: 48.0 %
-  Linf norm ≤ 0.00392156862745098:  4.7 %
-  Linf norm ≤ 0.01568627450980392:  0.0 %
-  
+
 ###############################################################################
 "PGD: EfficientNet"
 #  Linf norm ≤ 0     : 72.2 %
@@ -250,6 +218,41 @@ Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0.00392156862745098: 12.5 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 ##################################################
+"Origianl-PGD: Vit"  
+#robust accuracy for perturbations with
+ # Linf norm ≤ 0     : 88.6 %
+  #Linf norm ≤ 0.0003921568627450981: 78.1 %    ViT > EfficientNet
+  #Linf norm ≤ 0.001176470588235294: 56.7 %     ViT > EfficientNet
+  #Linf norm ≤ 0.00392156862745098: 12.5 %      EfficientNet > ViT
+  #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT
+1. step_size = eps/4
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 88.6 %
+  Linf norm ≤ 0.0003921568627450981: 76.2 %
+  Linf norm ≤ 0.001176470588235294: 46.2 %
+  Linf norm ≤ 0.00196078431372549: 25.4 %
+  Linf norm ≤ 0.0031372549019607846:  6.6 %
+  Linf norm ≤ 0.00392156862745098:  3.2 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+2. step_size=  eps/8 
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 88.6 %
+  Linf norm ≤ 0.0003921568627450981: 76.0 %
+  Linf norm ≤ 0.001176470588235294: 46.7 %
+  Linf norm ≤ 0.00196078431372549: 25.7 %
+Linf norm ≤ 0.0031372549019607846:  7.7 %
+  Linf norm ≤ 0.00392156862745098:  4.0 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+3. step_size = eps/12
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 88.6 %
+  Linf norm ≤ 0.0003921568627450981: 75.9 %
+  Linf norm ≤ 0.001176470588235294: 48.0 %
+  Linf norm ≤ 0.00196078431372549: 27.2 %
+  Linf norm ≤ 0.0031372549019607846:  8.1 %
+  Linf norm ≤ 0.00392156862745098:  4.7 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
+  ######################################################
 "PGD: ViT_Hybrid"
 1. step_size = eps/4
   Linf norm ≤ 0     : 87.1 %
@@ -277,7 +280,7 @@ Linf norm ≤ 0.0031372549019607846:  6.1 %
   Linf norm ≤ 0.00392156862745098:  3.7 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
   
-  
+
 
 #%%
 "Q1. Parameters of PGD - How do steps, step_size affects robustness?" 
@@ -290,14 +293,13 @@ step_size (learning rate)??
 "Q2. Size of epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
 Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
 Try smaller epsilons -> [0.5/255, 0.8/255]
-# Accuracy   ViT > Efficient 
-# 0.1/255    ViT > EfficientNet
-# 0.3/255    ViT > EfficientNet
-  0.5/255    EfficientNet > ViT
-  0.8/255    EfficientNet > ViT
-# 1/255      EfficientNet > ViT
-# 4/255      EfficientNet > ViT
-
+# Accuracy    
+# 0.1/255    ViT > Hybrid > Efficient
+# 0.3/255    ViT > Hybrid > Efficient
+  0.5/255    EfficientNet >  ViT > Hybrid 
+  0.8/255    EfficientNet >  ViT > Hybrid 
+  1/255      EfficientNet >  ViT > Hybrid 
+  4/255      EfficientNet >  ViT > Hybrid 
 
 
 #%%
@@ -307,25 +309,29 @@ Question 1: ViT has higher clean accuracy compared to CNNs. In this case, can we
   0.3/255    ViT > EfficientNet
   0.5/255    EfficientNet > ViT
   0.8/255    EfficientNet > ViT
+  
+
+"Q4. ViT + ResNet(CNNs) - Robustness " - How Convolution layer affects ViT robustness? 
+   
+# Accuracy   ViT > Efficient 
+# 0.1/255    Hybrid > ViT > EfficientNet
+# 0.3/255    Hybrid > ViT > EfficientNet
+  0.5/255    EfficientNet >  ViT > Hybrid 
+  0.8/255    EfficientNet >  ViT > Hybrid 
+  1/255      EfficientNet >  ViT > Hybrid 
+  4/255      EfficientNet >  ViT > Hybrid 
+  
+
+Hybrid is not robust compared to pure ViT and EfficientNet
+1. CNNs negative to Robustness 
+2. Why EfficientNet is robust to PGD? 
 
 "Q3. How to analyze the result of Deepfool?" - Also step_size????
 
 "Q5.ex. CNN - Purtubated images(around 200) - Overshoot in the edges like rings - How about ViT ??? "
 - Vit_explain(Attention Visualization) - PGD (CNNs vs ViT) 이해하기  
 
-"Q4. ViT + ResNet(CNNs) - Robustness " - How Convolution layer affects ViT robustness? 
-  
-FGSM: ViT + Resnet(CNN): model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device) 
-Accuracy of model is not correct!!!!
 
-clean accuracy:  60.5 % XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-robust accuracy for perturbations with
-  Linf norm ≤ 0     : 60.5 %
-  Linf norm ≤ 0.0003921568627450981: 43.7 %
-  Linf norm ≤ 0.001176470588235294: 21.9 %
-  Linf norm ≤ 0.00392156862745098:  3.9 %
-  Linf norm ≤ 0.01568627450980392:  0.4 %
-  
   
 "Q5. Increasing the Transformer Blocks improve robustness? (model size)? 
 : Compare results of ViT and CNNs

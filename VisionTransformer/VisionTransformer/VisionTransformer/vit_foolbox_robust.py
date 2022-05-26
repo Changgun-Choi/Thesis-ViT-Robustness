@@ -7,13 +7,10 @@
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransforre4mer"
-#python vit_foolbox_robust.py --model_name vit_hybrid --attack_name PGD --batch_size 16 --data_divide 10 --PGD_change yes --stepsize 4 --data_path server
+#python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --PGD_change yes --stepsize 12 --data_path server
 # nvidia-smi
-"""
-A simple example that demonstrates how to run a single attack against
-a PyTorch ResNet-18 model for different epsilons and how to then report
-the robust accuracy.
-"""
+""" A simple example that demonstrates how to run a single attack against a PyTorch ResNet-18 model for different epsilons and how to then report
+the robust accuracy """
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
@@ -50,15 +47,21 @@ if __name__ == '__main__':
     parser.add_argument('--stepsize',default = '4', type = int) # /4, 8, 12
     parser.add_argument('--PGD_change',default = 'no', type = str) 
     #parser.add_argument('--epsilon',default =  0.001176, type = float)  # 0.3/255
-
+    "Define args"
     args = parser.parse_args()  
     #print(args)
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")   ############################################
     #device = "cpu"
     with torch.no_grad():
-    
-        if args.model_name == 'resnet':
+        "https://rwightman.github.io/pytorch-image-models/models/vision-transformer/"
+        if args.model_name == 'resnet_18':
             model = torchvision.models.resnet18(pretrained=True).eval().to(device)
+        elif args.model_name == 'resnet_50_L':
+            model = timm.create_model('ResNet50-swsl',  pretrained=True).eval().to(device)
+        
+        elif args.model_name == 'mobilenet3':
+            model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
+            
         elif args.model_name == 'efficient':  
             model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
             #model = timm.create_model('efficientnet_b0', pretrained=True)
@@ -103,16 +106,9 @@ if __name__ == '__main__':
             model = SwinModel.from_pretrained("microsoft/swin-tiny-patch4-window7-224")
             from timm.models import swin_base_patch4_window7_224_in22k
             timm.list_models(pretrained=True) 
-            timm.list_models('*vit*')
+            timm.list_models('*mobile*')
        
             
-            
-        elif args.model_name == 'dino_vit':      # clean accuracy:  0.0 %
-            model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16', pretrained=True).eval().to(device)
-            
-        elif args.model_name == 'resnet50_dino':       # clean accuracy:  0.0 %
-            # instantiate a model (could also be a TensorFlow or JAX model)
-            model = torch.hub.load('facebookresearch/dino:main', 'dino_resnet50',pretrained=True).eval().to(device) # eval
  
     preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
     fmodel = PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)

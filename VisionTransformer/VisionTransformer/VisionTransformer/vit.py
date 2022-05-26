@@ -26,6 +26,10 @@ start = time.time()
 torch.manual_seed(0)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(de)
+    parser.add_argument
+
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Vision Transformer')                    
     parser.add_argument('--img_size', default=32, type=int, help='image size')            # Cifar 10: 32x 32, class: 10
     parser.add_argument('--patch_size', default=4, type=int, help='patch size')           # Patch_size: 4
@@ -35,11 +39,12 @@ if __name__ == "__main__":
     parser.add_argument('--lr', default=2e-3, type=float, help='learning rate')
     parser.add_argument('--drop_rate', default=.1, type=float, help='drop rate')
     parser.add_argument('--weight_decay', default=0, type=float, help='weight decay')
-    parser.add_argument('--num_classes', default=10, type=int, help='number of classes')  # Cifar 10 : 10 labels
+    parser.add_argument('--dataname', default='cifar10', type=str, help='data name')      # ImageNet
+    parser.add_argument('--num_classes', default=10, type=int, help='number of classes')  # 
+    "Cifar 10 : 10 labels"
     parser.add_argument('--latent_vec_dim', default=128, type=int, help='latent dimension')
     parser.add_argument('--num_heads', default=8, type=int, help='number of heads')
     parser.add_argument('--num_layers', default=12, type=int, help='number of layers in transformer')
-    parser.add_argument('--dataname', default='cifar10', type=str, help='data name')      # ImageNet
     parser.add_argument('--model_name', default='vit', type=str, help='data name')        # Vit
     "If function"
     parser.add_argument('--mode', default='train', type=str, help='train or evaluation')  # if args.mode == 'train': 이렇게 조건을 지정
@@ -52,8 +57,10 @@ if __name__ == "__main__":
     "Load Data: Image Patches-args 4개 여기서 사용"
     d = patchdata.Flattened2Dpatches(dataname=args.dataname, img_size=args.img_size, patch_size=args.patch_size, batch_size=args.batch_size)                                    
     trainloader, valloader, testloader, attackloader = d.patchdata()   # attack_loader
-    image_patches, _ = iter(trainloader).next()  # image_patches.size를 사용하려고 하나 꺼내옴  
-                        # for문처럼 하나씩 가져와서 처리하고 폐기해서 대용량처리에 좋음 # 함수의 경우: generator(), yield() : 메모리에 저장을 하지 않음, yield는 함수의 return 과 비슷"
+    "image_patches.size를 사용하려고 하나 꺼내옴  "
+    image_patches, img_labels = iter(trainloader).next()  
+                        # for문처럼 하나씩 가져와서 처리하고 폐기해서 대용량처리에 좋음 
+                        # 함수의 경우: generator(), yield() : 메모리에 저장을 하지 않음, yield는 함수의 return 과 비슷"
     "Load Model: ViT"
     # hyper for ViT model
     latent_vec_dim = args.latent_vec_dim   # mlp hidden을 정의하는데 사용하기 위해서 args.불러옴
@@ -64,47 +71,34 @@ if __name__ == "__main__":
         model = models.VisionTransformer(patch_vec_size=image_patches.size(2), num_patches=image_patches.size(1),   # image_patches.size 
                                   latent_vec_dim=latent_vec_dim, num_heads=args.num_heads, mlp_hidden_dim=mlp_hidden_dim,
                                   drop_rate=args.drop_rate, num_layers=args.num_layers, num_classes=args.num_classes).to(device)
-       
-        
-    
-    # vit(image_patches.to(device))
      # Test 40 * 128
 #%% 
     "Train"  
-        
     if args.mode == 'train':   # hyper-parameter
-    
         if args.pretrained == 1:
             model.load_state_dict(torch.load('./model.pth')) 
-            "주의하"
-            # model = model.load_state_dict(torch.load('./model.pth'))"
             # load_state_dict returns a NamedTuple with missing_keys and unexpected_keys fields, not a model object
         # Loss and optimizer
         criterion = nn.CrossEntropyLoss() # classification
-        
         if  args.optim == 'Adam':  # hyper
             optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
         elif args.optim == 'SGD':  # else 는 'SGD' 이렇게 설정이 불가능함 
             optimizer = torch.optim.SGD(model.parameters(), lr=args.lr, momentum=0.9)  # Finetuning 할때 사용함 (논) 
         #scheduler = optim.lr_scheduler.OneCycleLR(optimizer, max_lr=args.lr, steps_per_epoch=len(trainloader), epochs=args.epochs)
-
-        # Train
+        
         n = len(trainloader)                 # Num of batch
         best_acc = args.save_acc             # 0.5: Start Saving from 50% accuracy
         for epoch in range(args.epochs):     # args.epochs
-        
             running_loss = 0
             for img, labels in trainloader:  # Flattened patch
                 optimizer.zero_grad()        # 먼저 grad zero로 만들어
                 class_outputs, __ = model(img.to(device))  #1) Liner projection, position embedding -> Trnasformer -> 12 Head -> output
-                # img = image_patches: [128, 64, 48]
-                
+                # img: image_patches: [128, 64, 48]
                 loss = criterion(class_outputs, labels.to(device))
                 loss.backward()
                 optimizer.step()
                 running_loss += loss.item()  # loss.items(): 텐서에서 단순 scalar 값을 return 해줌
                 #scheduler.step()
-
             train_loss = running_loss / n    # 평균 loss 임 (n: len(trainloader)) 
             val_acc, val_loss = test.accuracy(valloader, model)  # Dataloader, Model
             # if epoch % 5 == 0:
