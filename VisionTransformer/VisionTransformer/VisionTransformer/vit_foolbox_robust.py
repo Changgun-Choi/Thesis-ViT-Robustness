@@ -3,11 +3,14 @@
 # git pull
 # cd "/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #conda activate thesis
-# python vit_foolbox_robust.py --model_name vit_resnet50 --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server 
+# python vit_foolbox_robust.py --model_name resnet50 --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransforre4mer"
 #python vit_foolbox_robust.py --model_name resnet50_L --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
+#python vit_foolbox_robust.py --model_name resnet50 --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change yes --stepsize 12
+
+
 # nvidia-smi
 """ A simple example that demonstrates how to run a single attack against a PyTorch ResNet-18 model for different epsilons and how to then report
 the robust accuracy """
@@ -177,8 +180,8 @@ if __name__ == '__main__':
             "defaults to 0.01 / 0.3"
             #stepsize = [i/4 for i in eps] 
             #epsilons = [args.epsilon]  # list
-            epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
-            epsilons = [0.5/255, 0.8/255]
+            epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255]
+            #epsilons = []
             accuracy = 0 
             r_success = torch.zeros(len(epsilons),args.batch_size).cuda()
             for batch_idx, (image, label) in enumerate(val_loader):

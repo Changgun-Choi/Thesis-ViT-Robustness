@@ -26,6 +26,15 @@ Created on Tue May 17 16:14:40 2022
   #Linf norm ≤ 0.00392156862745098: 33.8 %
   #Linf norm ≤ 0.01568627450980392: 24.5 %
   
+"FGSM: ResNet_50"
+clean accuracy:  84.2 %
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 84.2 %
+  Linf norm ≤ 0.0003921568627450981: 69.9 %
+  Linf norm ≤ 0.001176470588235294: 53.9 %
+  Linf norm ≤ 0.00392156862745098: 35.0 %
+  Linf norm ≤ 0.01568627450980392: 24.9 %
+  
 "FGSM: ViT"
 #clean accuracy:  88.6 %
 #robust accuracy for perturbations with
@@ -45,7 +54,7 @@ Created on Tue May 17 16:14:40 2022
   #Linf norm ≤ 0.01568627450980392: 43.5 %
     
 "FGSM: Swin"   "Robust to FGSM" 
-clean accuracy:  87.6 %
+#clean accuracy:  87.6 %
 #robust accuracy for perturbations with
  # Linf norm ≤ 0     : 87.6 %
   #Linf norm ≤ 0.0003921568627450981: 76.6 %
@@ -68,15 +77,22 @@ robust accuracy for perturbations with
   #Linf norm ≤ 0.001176470588235294: 24.1 %
   #Linf norm ≤ 0.00392156862745098:  0.4 %
   #Linf norm ≤ 0.01568627450980392:  0.0 %
-  
- 
-  
+    
 "PGD: EfficientNet"
-#  Linf norm ≤ 0     : 72.2 %  # 80.4 %
-#  Linf norm ≤ 0.0003921568627450981: 61.3 %     ViT > EfficientNet
-#  Linf norm ≤ 0.001176470588235294: 43.8 %      ViT > EfficientNet
-#  Linf norm ≤ 0.00392156862745098: 12.7 %       EfficientNet > ViT
-#  Linf norm ≤ 0.011764705882352941:  0.6 %      EfficientNet > ViT
+  Linf norm ≤ 0     : 80.4 %
+  Linf norm ≤ 0.0003921568627450981: 71.6 %
+  Linf norm ≤ 0.001176470588235294: 52.5 %
+  Linf norm ≤ 0.00392156862745098: 20.6 %
+  Linf norm ≤ 0.01568627450980392:  0.1 %
+
+"PGD: ResNet_50" 아직 
+clean accuracy:  84.2 %
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 84.2 %
+  Linf norm ≤ 0.0003921568627450981: 68.8 %
+  Linf norm ≤ 0.001176470588235294: 42.5 %
+  Linf norm ≤ 0.00392156862745098:  9.2 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
 
 "PGD: Vit"  
 #robust accuracy for perturbations with
@@ -145,7 +161,9 @@ robust accuracy for perturbations with
 #%%
 "Test data: 800 test dataset, 5 Models tested "
 # Adversarial attack: maximizing the inner optimization problem
-"FGSM:     Swin > DeiT > ViT_Res > ViT > EfficientNet > ResNet"   - Larger epsilon(1/255, 4/255)
+
+"FGSM:     Swin > DeiT > ViT_Res > ViT > ResNet_50 > EfficientNet > ResNet"   - Larger epsilon(1/255, 4/255)
+Epsilon으로 비교 
 "PGD:      EfficientNet > ViT > DeiT > Swin > ResNet"
 "DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
 # minimal perturbation to fool
@@ -217,6 +235,7 @@ Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 ##################################################
 "Origianl-PGD: Vit"  
+
 1. step_size = eps/4
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 88.6 %
@@ -268,7 +287,7 @@ Linf norm ≤ 0.0031372549019607846:  6.1 %
   Linf norm ≤ 0.0003921568627450981: 72.2 %
   Linf norm ≤ 0.001176470588235294: 41.8 %
   Linf norm ≤ 0.00196078431372549: 21.9 %
- Linf norm ≤ 0.0031372549019607846:  7.5 %
+  Linf norm ≤ 0.0031372549019607846:  7.5 %
   Linf norm ≤ 0.00392156862745098:  3.7 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
   
