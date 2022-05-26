@@ -7,7 +7,7 @@
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransforre4mer"
-#python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --PGD_change yes --stepsize 12 --data_path server
+#python vit_foolbox_robust.py --model_name resnet_50_L --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
 # nvidia-smi
 """ A simple example that demonstrates how to run a single attack against a PyTorch ResNet-18 model for different epsilons and how to then report
 the robust accuracy """
@@ -56,8 +56,8 @@ if __name__ == '__main__':
         "https://rwightman.github.io/pytorch-image-models/models/vision-transformer/"
         if args.model_name == 'resnet_18':
             model = torchvision.models.resnet18(pretrained=True).eval().to(device)
-        elif args.model_name == 'resnet_50_L':
-            model = timm.create_model('ResNet50-swsl',  pretrained=True).eval().to(device)
+        elif args.model_name == 'resnet50_L':
+            model = timm.create_model('swsl_resnet50',  pretrained=True).eval().to(device)
         
         elif args.model_name == 'mobilenet3':
             model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
@@ -106,7 +106,7 @@ if __name__ == '__main__':
             model = SwinModel.from_pretrained("microsoft/swin-tiny-patch4-window7-224")
             from timm.models import swin_base_patch4_window7_224_in22k
             timm.list_models(pretrained=True) 
-            timm.list_models('*mobile*')
+            timm.list_models('*resnet50*')
        
             
  

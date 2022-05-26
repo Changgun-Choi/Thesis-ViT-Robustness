@@ -219,12 +219,6 @@ Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 ##################################################
 "Origianl-PGD: Vit"  
-#robust accuracy for perturbations with
- # Linf norm ≤ 0     : 88.6 %
-  #Linf norm ≤ 0.0003921568627450981: 78.1 %    ViT > EfficientNet
-  #Linf norm ≤ 0.001176470588235294: 56.7 %     ViT > EfficientNet
-  #Linf norm ≤ 0.00392156862745098: 12.5 %      EfficientNet > ViT
-  #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT
 1. step_size = eps/4
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 88.6 %
