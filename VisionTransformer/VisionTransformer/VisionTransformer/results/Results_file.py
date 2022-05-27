@@ -235,29 +235,7 @@ Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0.00392156862745098: 12.5 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 ##############################################################
-"PGD: ResNet50"
 
-  Linf norm ≤ 0     : 84.2 %
-  Linf norm ≤ 0.0003921568627450981: 65.1 %
-  Linf norm ≤ 0.001176470588235294: 28.9 %
-  Linf norm ≤ 0.00196078431372549: 12.5 %
-  Linf norm ≤ 0.0031372549019607846:  4.0 %
-  Linf norm ≤ 0.00392156862745098:  2.6 %
-                                      0
-  Linf norm ≤ 0     : 84.2 %
-Linf norm ≤ 0.0003921568627450981: 65.1 %
-Linf norm ≤ 0.001176470588235294: 30.4 %
-Linf norm ≤ 0.00196078431372549: 14.0 %
-Linf norm ≤ 0.0031372549019607846:  4.9 %
-Linf norm ≤ 0.00392156862745098:  2.9 %
-
-Linf norm ≤ 0     : 84.2 %
-Linf norm ≤ 0.0003921568627450981: 65.1 %
-Linf norm ≤ 0.001176470588235294: 31.9 %
-Linf norm ≤ 0.00196078431372549: 15.6 %
-Linf norm ≤ 0.0031372549019607846:  5.9 %
-Linf norm ≤ 0.00392156862745098:  3.4 %
-##################################################
 "Origianl-PGD: Vit"  
 
 1. step_size = eps/4
@@ -288,6 +266,30 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.00392156862745098:  4.7 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
   ######################################################
+  
+"PGD: ResNet50"
+
+  Linf norm ≤ 0     : 84.2 %
+  Linf norm ≤ 0.0003921568627450981: 65.1 %
+  Linf norm ≤ 0.001176470588235294: 28.9 %
+  Linf norm ≤ 0.00196078431372549: 12.5 %
+  Linf norm ≤ 0.0031372549019607846:  4.0 %
+  Linf norm ≤ 0.00392156862745098:  2.6 %
+                                      0
+  Linf norm ≤ 0     : 84.2 %
+Linf norm ≤ 0.0003921568627450981: 65.1 %
+Linf norm ≤ 0.001176470588235294: 30.4 %
+Linf norm ≤ 0.00196078431372549: 14.0 %
+Linf norm ≤ 0.0031372549019607846:  4.9 %
+Linf norm ≤ 0.00392156862745098:  2.9 %
+
+Linf norm ≤ 0     : 84.2 %
+Linf norm ≤ 0.0003921568627450981: 65.1 %
+Linf norm ≤ 0.001176470588235294: 31.9 %
+Linf norm ≤ 0.00196078431372549: 15.6 %
+Linf norm ≤ 0.0031372549019607846:  5.9 %
+Linf norm ≤ 0.00392156862745098:  3.4 %
+##################################################
 "PGD: ViT_Hybrid"
 1. step_size = eps/4
   Linf norm ≤ 0     : 87.1 %
@@ -319,7 +321,7 @@ Linf norm ≤ 0.0031372549019607846:  6.1 %
 
 #%%
 "Q1. Parameters of PGD - How do steps, step_size affects robustness?" 
-"PGD Insight(3 different step_size): Vit is more robust than EfficientNet is more robust than ViT when epsilon is smaller than 0.5/255 "
+"PGD Insight(3 different step_size): Vit is more robust than EfficientNet when epsilon is smaller than 0.5/255 "
 step_size changes depending on epsilons(each epsilon has different step_size) "eps/4, eps/8, eps/12" - 
 step_size (learning rate)??
 1) small : Finding optimum takes time 
@@ -327,38 +329,22 @@ step_size (learning rate)??
 
 "Q2. Size of epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
 Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
-Try smaller epsilons -> [0.5/255, 0.8/255]
-# Accuracy    
-# 0.1/255    ViT > Hybrid > Efficient
-# 0.3/255    ViT > Hybrid > Efficient
-  0.5/255    EfficientNet >  ViT > Hybrid 
-  0.8/255    EfficientNet >  ViT > Hybrid 
-  1/255      EfficientNet >  ViT > Hybrid 
-  4/255      EfficientNet >  ViT > Hybrid 
+Try smaller epsilons to verify the PGD results -> [0.5/255, 0.8/255]
+ "Accuracy   ViT > Efficient"   88.6 > 80.4
+  0.1/255    ViT > Hybrid > Efficient > ResNet50
+  0.3/255    ViT > Hybrid > Efficient > ResNet50
+  0.5/255    EfficientNet >  ViT > Hybrid > ResNet50 > Resnet
+  0.8/255    EfficientNet >  ViT > Hybrid > ResNet50 > Resnet
+  1/255      EfficientNet >  ViT > Hybrid > ResNet50 > Resnet
+  4/255      EfficientNet >  ViT > Hybrid > ResNet50 > Resnet
 
-
-#%%
-Question 1: ViT has higher clean accuracy compared to CNNs. In this case, can we say ViT is more robust with smaller epsilons of pertubation?
-  "Accuracy   ViT > Efficient"   88.6 > 80.4
-  0.1/255    ViT > EfficientNet
-  0.3/255    ViT > EfficientNet
-  0.5/255    EfficientNet > ViT
-  0.8/255    EfficientNet > ViT
-  
-
-"Q4. ViT + ResNet(CNNs) - Robustness " - How Convolution layer affects ViT robustness? 
+"Q3. ViT + ResNet(CNNs) - Robustness " - How Convolution layer affects ViT robustness? 
 -> Convolutional layer have bad affect on Robustness (Hybrid) and results of ResNet 50
 -> However, EfficientNet is strong to PGD (My finding)
 
 "Q5. Why Efficient is Robust??? "
    
-# Accuracy   ViT > Efficient 
-# 0.1/255    Hybrid > ViT > EfficientNet
-# 0.3/255    Hybrid > ViT > EfficientNet
-  0.5/255    EfficientNet >  ViT > Hybrid 
-  0.8/255    EfficientNet >  ViT > Hybrid 
-  1/255      EfficientNet >  ViT > Hybrid 
-  4/255      EfficientNet >  ViT > Hybrid 
+
   
 
 Hybrid is not robust compared to pure ViT and EfficientNet
@@ -369,7 +355,6 @@ Hybrid is not robust compared to pure ViT and EfficientNet
 
 "Q5.ex. CNN - Purtubated images(around 200) - Overshoot in the edges like rings - How about ViT ??? "
 - Vit_explain(Attention Visualization) - PGD (CNNs vs ViT) 이해하기  
-
 
   
 "Q5. Increasing the Transformer Blocks improve robustness? (model size)? 
