@@ -35,6 +35,7 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.00392156862745098: 35.0 %
   Linf norm ≤ 0.01568627450980392: 24.9 %
   
+  
 "FGSM: ViT"
 #clean accuracy:  88.6 %
 #robust accuracy for perturbations with
@@ -85,7 +86,7 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.00392156862745098: 20.6 %
   Linf norm ≤ 0.01568627450980392:  0.1 %
 
-"PGD: ResNet_50" 아직 
+"PGD: ResNet_50" 
 clean accuracy:  84.2 %
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 84.2 %
@@ -102,8 +103,8 @@ robust accuracy for perturbations with
   #Linf norm ≤ 0.00392156862745098: 12.5 %      EfficientNet > ViT
   #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT
 
-"PGD: DeiT"
-##  Linf norm ≤ 0     : 79.8 %
+"PGD: DeiT" 다시다시다
+   Linf norm ≤ 0     : 79.8 %
   #Linf norm ≤ 0.0003921568627450981: 64.9 %
   #Linf norm ≤ 0.001176470588235294: 37.7 %
   #Linf norm ≤ 0.00392156862745098:  6.7 %
@@ -161,11 +162,11 @@ robust accuracy for perturbations with
 #%%
 "Test data: 800 test dataset, 5 Models tested "
 # Adversarial attack: maximizing the inner optimization problem
-
-"FGSM:     Swin > DeiT > ViT_Res > ViT > ResNet_50 > EfficientNet > ResNet"   - Larger epsilon(1/255, 4/255)
+"Accuracy" : Vit >  Swin > Hybrid > DeiT > Resnet50> efficient > ResNet
+FGSM:       Swin > DeiT > Hybrid > ViT > "ResNet_50" > EfficientNet > ResNet   - Larger epsilon(1/255, 4/255)
 Epsilon으로 비교 
-"PGD:      EfficientNet > ViT > DeiT > Swin > ResNet"
-"DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
+"PGD:      EfficientNet > ViT > ResNet_50 > DeiT > Swin > ResNet"
+#"DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
 # minimal perturbation to fool
 # https://velog.io/@wilko97/%EB%85%BC%EB%AC%B8%EB%A6%AC%EB%B7%B0-DeepFool-a-simple-and-accurate-method-to-fool-deep-neural-networks-CVPR-2016
 
@@ -233,6 +234,29 @@ Linf norm ≤ 0.0031372549019607846: 15.3 %
   Linf norm ≤ 0.0031372549019607846: 17.3 %
   Linf norm ≤ 0.00392156862745098: 12.5 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
+##############################################################
+"PGD: ResNet50"
+
+  Linf norm ≤ 0     : 84.2 %
+  Linf norm ≤ 0.0003921568627450981: 65.1 %
+  Linf norm ≤ 0.001176470588235294: 28.9 %
+  Linf norm ≤ 0.00196078431372549: 12.5 %
+  Linf norm ≤ 0.0031372549019607846:  4.0 %
+  Linf norm ≤ 0.00392156862745098:  2.6 %
+                                      0
+  Linf norm ≤ 0     : 84.2 %
+Linf norm ≤ 0.0003921568627450981: 65.1 %
+Linf norm ≤ 0.001176470588235294: 30.4 %
+Linf norm ≤ 0.00196078431372549: 14.0 %
+Linf norm ≤ 0.0031372549019607846:  4.9 %
+Linf norm ≤ 0.00392156862745098:  2.9 %
+
+Linf norm ≤ 0     : 84.2 %
+Linf norm ≤ 0.0003921568627450981: 65.1 %
+Linf norm ≤ 0.001176470588235294: 31.9 %
+Linf norm ≤ 0.00196078431372549: 15.6 %
+Linf norm ≤ 0.0031372549019607846:  5.9 %
+Linf norm ≤ 0.00392156862745098:  3.4 %
 ##################################################
 "Origianl-PGD: Vit"  
 
@@ -323,6 +347,10 @@ Question 1: ViT has higher clean accuracy compared to CNNs. In this case, can we
   
 
 "Q4. ViT + ResNet(CNNs) - Robustness " - How Convolution layer affects ViT robustness? 
+-> Convolutional layer have bad affect on Robustness (Hybrid) and results of ResNet 50
+-> However, EfficientNet is strong to PGD (My finding)
+
+"Q5. Why Efficient is Robust??? "
    
 # Accuracy   ViT > Efficient 
 # 0.1/255    Hybrid > ViT > EfficientNet
