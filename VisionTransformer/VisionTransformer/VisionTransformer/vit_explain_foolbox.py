@@ -38,7 +38,7 @@ import torch
 import eagerpy as ep
 from foolbox import PyTorchModel, accuracy, samples
 from foolbox.attacks import LinfPGD
-from pytorch_pretrained_vit import ViT
+#from pytorch_pretrained_vit import ViT
 import foolbox as fb
 import timm
 #assert timm.__version__ == "0.3.2"
