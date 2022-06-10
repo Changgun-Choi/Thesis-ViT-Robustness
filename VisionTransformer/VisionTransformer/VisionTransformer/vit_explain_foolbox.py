@@ -1,7 +1,8 @@
 "https://jacobgil.github.io/deeplearning/vision-transformer-explainability"
 #set PYTHONPATH="C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #cd C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
-#python vit_explain_foolbox.py --model_name dino_vit --attack_name LinfPGD --use_cuda --head_fusion "min" --discard_ratio 0.9 
+#python vit_explain_foolbox.py --model_name efficient --attack_name LinfPGD --use_cuda  --visual Grad_Cam
+#--head_fusion "min" --discard_ratio 0.9 
 
 "1. vit_rollout"
 #python vit_explain.py --image_path "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/vit_visualization/examples/input.png" --head_fusion "min" --discard_ratio 0.8 
@@ -13,7 +14,7 @@
 
 "Different Attention Head fusion methods"
 "Removing the lowest attentions"
-
+#!pip install grad-cam
 import os
 os.chdir('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer')
 import argparse
@@ -24,7 +25,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 from pathlib import Path
-from attacks import *                                                                                                                                           
+#from attacks import *                                                                                                                                           
 ## 
 from models import *
 from models import VisionTransformer
@@ -40,12 +41,19 @@ from foolbox.attacks import LinfPGD
 from pytorch_pretrained_vit import ViT
 import foolbox as fb
 import timm
-assert timm.__version__ == "0.3.2"
+#assert timm.__version__ == "0.3.2"
 
 from functools import partial
 from timm.models.vision_transformer import VisionTransformer, _cfg
 from timm.models.registry import register_model
 from timm.models.layers import trunc_normal_
+#%%
+"Grad Cam"
+from pytorch_grad_cam import GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+from pytorch_grad_cam.utils.image import show_cam_on_image
+
+#https://www.kaggle.com/code/meaninglesslives/efficientnet-gradcam-comparison-to-other-models/notebook
 #%%
 def get_args(): 
     if args.use_cuda:
@@ -77,6 +85,9 @@ if __name__ == '__main__':
                         help='How many of the lowest 14x14 attention paths should we discard')
     parser.add_argument('--category_index', type=int, default=None,
                         help='The category index for gradient rollout')
+    
+    parser.add_argument('--visual', type=str, default='Grad_Cam')
+
     "If category_index isn't specified, Attention Rollout will be used"
    
     args = parser.parse_args()
@@ -85,33 +96,48 @@ if __name__ == '__main__':
     args.image_path = "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/corgie.jpg"
     
     #%%
-    if args.model_name == 'vit': # RuntimeError: The size of tensor a (197) must match the size of tensor b (577) at non-singleton dimension 1
-        model = timm.create_model('vit_base_patch16_224', pretrained=True).eval()     
-        
-    elif args.model_name == 'deit': # DeiT (Data-Efficient Image Transformers)
-        #model = torch.hub.load('facebookresearch/deit:main', 'deit_base_patch16_224', pretrained=True).eval().to(device)        
-        def deit_base_patch16_224(pretrained=False, **kwargs): 
-            model = VisionTransformer(
-                patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
-                norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
-            model.default_cfg = _cfg()
-            if pretrained:
-                checkpoint = torch.hub.load_state_dict_from_url(
-                    url="https://dl.fbaipublicfiles.com/deit/deit_base_patch16_224-b5f2ef4d.pth",
-                    map_location="cpu", check_hash=True
-                )
-                model.load_state_dict(checkpoint["model"])
-            return model
-        model = deit_base_patch16_224(pretrained=True).eval()
-        
-        "self-supervised training of Vision Transformers"
-    elif args.model_name == 'dino_vit': 
-        model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16').eval().to(device)
-
-    elif args.model_name == 'dino_xcit':   
-            model = torch.hub.load('facebookresearch/dino:main', 'dino_xcit_medium_24_p16').eval().to(device)
-                               # result = torch.matmul(a, result)   # 64x64 and 197x197
-                               # RuntimeError: mat1 and mat2 shapes cannot be multiplied (64x64 and 197x197)
+    with torch.no_grad():
+        "https://rwightman.github.io/pytorch-image-models/models/vision-transformer/"
+        if args.model_name == 'resnet_18':   # 68.4 %
+            model = torchvision.models.resnet18(pretrained=True).eval().to(device)
+            
+        elif args.model_name == 'resnet50': # 80.53
+            model = timm.create_model('resnet50',  pretrained=True).eval().to(device)
+          # ResNet50-swsl pre-trained on IG-1B-Targeted (Mahajan et al. (2018)) using semi-weakly supervised methods (Yalniz et al. (2019))
+        #elif args.model_name == 'mobilenet3':
+         #   model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
+            
+        elif args.model_name == 'efficient':  # 72.2 %
+            model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
+            #model = timm.create_model('efficientnet_b0', pretrained=True)
+            
+        elif args.model_name == 'vit':
+            model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
+            
+        elif args.model_name == 'vit_hybrid': #   
+            "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py
+            model = timm.create_model('vit_large_r50_s32_224', pretrained=True,num_classes=1000).eval().to(device)
+            # vit_base_r50_s16_384  # vit_base_resnet50_384
+            
+        elif args.model_name == 'deit': 
+            #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
+            def deit_base_patch16_224(pretrained=False, **kwargs):
+                model = VisionTransformer(
+                    patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
+                    norm_layer=partial(nn.LayerNorm, eps=1e-6), **kwargs)
+                model.default_cfg = _cfg()
+                if pretrained:
+                    checkpoint = torch.hub.load_state_dict_from_url(
+                        url="https://dl.fbaipublicfiles.com/deit/deit_base_patch16_224-b5f2ef4d.pth",
+                        map_location="cpu", check_hash=True
+                    )
+                    model.load_state_dict(checkpoint["model"])
+                return model
+            model = deit_base_patch16_224(pretrained=True).eval().to(device)  
+       
+        elif args.model_name == 'swin':
+            model = timm.create_model('swin_base_patch4_window7_224', pretrained=True).eval().to(device)
+            
     if args.use_cuda:
         model = model.cuda()
 #%%
@@ -156,7 +182,7 @@ if __name__ == '__main__':
             #print("    ", str(perturbation_sizes).replace("\n", "\n" + "    "))
             #if acc2 == 0:
             #    break
-##############################################################################################################
+####################################################################################################################
             original_img_view = images.squeeze(0).detach().cpu()  #[3,224,224]
             original_img_view = original_img_view.transpose(0,2).transpose(0,1).numpy()  #[224,224,3]
             "clipped_advs"
@@ -177,25 +203,42 @@ if __name__ == '__main__':
             a[1].imshow(original_img_view)
             plt.show()
             
-            
-            
-            "Original Roll_out"
-           # perturbed_data    
-            if args.category_index is None:          # "If category_index isn't specified, Attention Rollout will be used"
-                print("Doing Attention Rollout")
-                #attention_rollout = VITAttentionRollout(model, head_fusion=args.head_fusion, discard_ratio=args.discard_ratio)
-                #mask = attention_rollout(perturbed_data)
+            if args.visual == 'Grad_Cam':
+                target_layer = model._conv_head
+                input_tensor  = images
+                targets = labels
+                # Construct the CAM object once, and then re-use it on many images:
+                cam = GradCAM(model=model, target_layers=target_layers, use_cuda=args.use_cuda)
+                rgb_img = cv2.imread(args.image_path, 1)[:, :, ::-1]
+                rgb_img = np.float32(rgb_img) / 255
                 
-                attention_rollout = VITAttentionRollout(model, head_fusion=args.head_fusion, discard_ratio=args.discard_ratio)
-                mask = attention_rollout(perturbed_data) ###############
-                
-                name = "attention_rollout_{}_{:.3f}_{}_{}.png".format(args.model_name, args.discard_ratio, args.head_fusion, epsilon)
-            else:
-                print("Doing Gradient Attention Rollout")
-                grad_rollout = VITAttentionGradRollout(model, discard_ratio=args.discard_ratio)
-                mask = grad_rollout(perturbed_data, args.category_index)
-                name = "grad_rollout_{}_{}_{:.3f}_{}_{}.png".format(args.model_name, args.category_index, args.discard_ratio, args.head_fusion, epsilon)
+                grayscale_cam = cam(input_tensor=input_tensor, targets=targets)
 
+                # In this example grayscale_cam has only one image in the batch:
+                grayscale_cam = grayscale_cam[0, :]     
+                visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
+            
+            elif args.visual == 'ViT_vis':
+                            
+                "Original Roll_out"
+               # perturbed_data    
+                if args.category_index is None:          # "If category_index isn't specified, Attention Rollout will be used"
+                    print("Doing Attention Rollout")
+                    #attention_rollout = VITAttentionRollout(model, head_fusion=args.head_fusion, discard_ratio=args.discard_ratio)
+                    #mask = attention_rollout(perturbed_data)
+                    
+                    attention_rollout = VITAttentionRollout(model, head_fusion=args.head_fusion, discard_ratio=args.discard_ratio)
+                    mask = attention_rollout(perturbed_data) ###############
+                    
+                    name = "attention_rollout_{}_{:.3f}_{}_{}.png".format(args.model_name, args.discard_ratio, args.head_fusion, epsilon)
+                else:
+                    print("Doing Gradient Attention Rollout")
+                    grad_rollout = VITAttentionGradRollout(model, discard_ratio=args.discard_ratio)
+                    mask = grad_rollout(perturbed_data, args.category_index)
+                    name = "grad_rollout_{}_{}_{:.3f}_{}_{}.png".format(args.model_name, args.category_index, args.discard_ratio, args.head_fusion, epsilon)
+
+            
+    
             # Roll_out for Adversal Examples
             np_img = img.resize((224,224),Image.ANTIALIAS)
             np_img = np.array(img)[:, :, ::-1]

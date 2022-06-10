@@ -163,8 +163,8 @@ robust accuracy for perturbations with
 "Test data: 800 test dataset, 5 Models tested "
 # Adversarial attack: maximizing the inner optimization problem
 "Accuracy" : Vit >  Swin > Hybrid > DeiT > Resnet50> efficient > ResNet
-FGSM:       Swin > DeiT > Hybrid > ViT > "ResNet_50" > EfficientNet > ResNet   - Larger epsilon(1/255, 4/255)
-Epsilon으로 비교 
+FGSM:       Swin > DeiT > "Hybrid" > ViT > "ResNet_50" > EfficientNet > ResNet  
+
 "PGD:      EfficientNet > ViT > ResNet_50 > DeiT > Swin > ResNet"
 #"DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
 # minimal perturbation to fool
@@ -320,47 +320,65 @@ Linf norm ≤ 0.0031372549019607846:  6.1 %
 
 
 #%%
-"Q1. Parameters of PGD - How do steps, step_size affects robustness?" 
+"Q1. Parameters of PGD - How does step_size affects robustness?" 
 "PGD Insight(3 different step_size): Vit is more robust than EfficientNet when epsilon is smaller than 0.5/255 "
 step_size changes depending on epsilons(each epsilon has different step_size) "eps/4, eps/8, eps/12" - 
 step_size (learning rate)??
 1) small : Finding optimum takes time 
 2) Huge  : may skip optimum
 
-"Q2. Size of epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
+"Q1-2. Size of epsilons could affect PGD, ViTs? - step_size will be changed depending on epsilons"
 Original epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  
 Try smaller epsilons to verify the PGD results -> [0.5/255, 0.8/255]
- "Accuracy   ViT > Efficient"   88.6 > 80.4
-  0.1/255    ViT > Hybrid > Efficient > ResNet50
-  0.3/255    ViT > Hybrid > Efficient > ResNet50
-  0.5/255    EfficientNet >  ViT > Hybrid > ResNet50 > Resnet
-  0.8/255    EfficientNet >  ViT > Hybrid > ResNet50 > Resnet
-  1/255      EfficientNet >  ViT > Hybrid > ResNet50 > Resnet
-  4/255      EfficientNet >  ViT > Hybrid > ResNet50 > Resnet
+#######################################################################################################
+"Test data: 800 dataset, 7 Models tested 
+- More experiments with Hybrid and ResNet50 models. 
 
-"Q3. ViT + ResNet(CNNs) - Robustness " - How Convolution layer affects ViT robustness? 
--> Convolutional layer have bad affect on Robustness (Hybrid) and results of ResNet 50
--> However, EfficientNet is strong to PGD (My finding)
+Accuracy   : Vit >  Swin > "Hybrid" > DeiT > "CNN" (Resnet50 > EfficientNet > ResNet)
+FGSM:       Swin >  DeiT > "Hybrid" > ViT  > "CNN" (ResNet50> EfficientNet > ResNet)
+PGD:
+  0.1/255    ViT > "Hybrid" > CNN (EfficientNet > ResNet50 > Resnet)
+  0.3/255    ViT > "Hybrid" > CNN (EfficientNet > ResNet50 > Resnet)
+  0.5/255    "EfficientNet" >  ViT > "Hybrid" > "ResNet50" > Resnet
+  0.8/255    "EfficientNet" >  ViT > "Hybrid" > "ResNet50" > Resnet
+  1/255      "EfficientNet" >  ViT > "Hybrid" > "ResNet50" > Resnet
+  4/255      "EfficientNet" >  ViT > "Hybrid" > "ResNet50" > Resnet
 
-"Q5. Why Efficient is Robust??? "
-   
+"Analysis of Results"
+0. ViT more robust than general CNNs
+: e ViTs learn less high-frequency features
+ One possible explanation is that the introduced modules improve the classification accuracy 
+by remembering the low-level structures that repeatedly appear in the training dataset. 
+These structures
+such as edges and lines are high-frequent and sensitive to perturbations. Learning such featuresmakes the model more vulnerable to adversarial attacks
 
-  
+1. PGD: ViT is more robust than Hybrid and general CNNs except "EfficientNet"
+"Q. Robustness of Hybrid " - How Convolution layer affects ViT robustness?
+-> Results of "Hybrid" and CNNs_"ResNet 50" shows that Convolutional layer have bad affect on Robustness 
+-> However, "EfficientNet" is strong to PGD (My finding)
 
-Hybrid is not robust compared to pure ViT and EfficientNet
-1. CNNs negative to Robustness 
-2. Why EfficientNet is robust to PGD? 
+"Q. Why EfficientNet is Robust to PGD? "
+Reason could be Training or Architecture?
+- Training - Learning rate? 
 
-"Q3. How to analyze the result of Deepfool?" - Also step_size????
+2. Results of CNNs comparison
+Accuracy and FGSM:  Resnet50 > EfficientNet  (Higher accuracy, More Robust)
+PGD              :  EfficientNet > Resnet50
 
-"Q5.ex. CNN - Purtubated images(around 200) - Overshoot in the edges like rings - How about ViT ??? "
-- Vit_explain(Attention Visualization) - PGD (CNNs vs ViT) 이해하기  
+"Q CNN - Purtubated images(around 200) - Overshoot in the edges like rings"
+   ViT - How does Purtubated images look like??
+- "Q. Visualization of CNNs??" - GradCam ++
+ex. CNNs - Strided COnvloution - attacks higlyfrequency  - attacking Pooling operation - changes globally 
+
+- Vit_explain(Attention Visualization) - PGD (CNNs vs ViT)   
+2. Origianl RObustness??
+
+"Q6. Evaluate confidence of Robustness"
+- ex. 0.5- dog, 0.3 - cat   --> CNN is confidence score 99%  
+PGD: ex. confident on wrong prediction. 
 
   
 "Q5. Increasing the Transformer Blocks improve robustness? (model size)? 
 : Compare results of ViT and CNNs
 
 #=================================================
-"New_Q. Evaluate confidence of Rob"
-#- ex. 0.5- dog, 0.3 - cat   --> CNN is confident 99%  
-#PGD: ex. confident on wrong prediction. 

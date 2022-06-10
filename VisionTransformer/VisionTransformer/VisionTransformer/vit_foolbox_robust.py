@@ -6,14 +6,15 @@
 # python vit_foolbox_robust.py --model_name resnet50 --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
-#cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransforre4mer"
-#python vit_foolbox_robust.py --model_name resnet50_L --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
+#cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
+#python vit_foolbox_robust.py --model_name efficient --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server
 #python vit_foolbox_robust.py --model_name resnet50 --attack_name PGD --batch_size 16 --data_divide 10 --data_path server --PGD_change yes --stepsize 12
 
 
 # nvidia-smi
 """ A simple example that demonstrates how to run a single attack against a PyTorch ResNet-18 model for different epsilons and how to then report
 the robust accuracy """
+#!pip install grad-cam
 import torchvision
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
@@ -66,9 +67,11 @@ if __name__ == '__main__':
         #elif args.model_name == 'mobilenet3':
          #   model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
             
-        elif args.model_name == 'efficient':  # 72.2 %
+        elif args.model_name == 'efficient':  #  80.4
             model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
             #model = timm.create_model('efficientnet_b0', pretrained=True)
+            from efficientnet_pytorch import EfficientNet
+            model = EfficientNet.from_pretrained('efficientnet-b0').eval().to(device)
             
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
