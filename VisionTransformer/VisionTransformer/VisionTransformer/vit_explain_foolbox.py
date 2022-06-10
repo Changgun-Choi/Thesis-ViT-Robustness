@@ -16,7 +16,7 @@
 "Removing the lowest attentions"
 #!pip install grad-cam
 import os
-os.chdir('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer')
+#os.chdir('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer')
 import argparse
 import torch
 from PIL import Image
