@@ -93,7 +93,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args.use_cuda = args.use_cuda and torch.cuda.is_available()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") 
-    args.image_path = "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/corgie.jpg"
+    #args.image_path = "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/corgie.jpg"
     
     #%%
     with torch.no_grad():
@@ -107,10 +107,12 @@ if __name__ == '__main__':
         #elif args.model_name == 'mobilenet3':
          #   model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
             
-        elif args.model_name == 'efficient':  # 72.2 %
+        elif args.model_name == 'efficient':  # 80
             model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
             #model = timm.create_model('efficientnet_b0', pretrained=True)
-            
+            #from efficientnet_pytorch import EfficientNet
+            #model = EfficientNet.from_pretrained('efficientnet-b0') 
+      
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
             
@@ -204,7 +206,8 @@ if __name__ == '__main__':
             plt.show()
             
             if args.visual == 'Grad_Cam':
-                target_layer = model._conv_head
+                #target_layer = model._conv_head
+                target_layer = model.features.conv
                 input_tensor  = images
                 targets = labels
                 # Construct the CAM object once, and then re-use it on many images:
