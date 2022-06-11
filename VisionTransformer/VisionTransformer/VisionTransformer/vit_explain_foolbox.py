@@ -173,7 +173,7 @@ if __name__ == '__main__':
         #robust_accuracy = 1 - success.float().mean(axis=-1) # succes of Attack
         print("robust accuracy for perturbations with")
         for epsilon,  advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
-            print(f"  Linf norm ≤ {epsilon:<6}: {acc.item() * 100:4.1f} %")
+            #print(f"  Linf norm ≤ {epsilon:<6}: {acc.item() * 100:4.1f} %")
             #acc2 = accuracy(fmodel, advs_, labels) 
             #print(f"  Linf norm ≤ {epsilon:<6}: {acc2 * 100:4.1f} %")
             #print("    perturbation sizes:")
