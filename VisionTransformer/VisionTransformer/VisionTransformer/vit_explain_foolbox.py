@@ -1,8 +1,7 @@
 "https://jacobgil.github.io/deeplearning/vision-transformer-explainability"
 #set PYTHONPATH="C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #cd C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
-#python vit_explain_foolbox.py --model_name efficient --attack_name LinfPGD --use_cuda  --visual Grad_Cam
-#--head_fusion "min" --discard_ratio 0.9 
+#python vit_explain_foolbox.py --model_name efficient --attack_name LinfPGD --use_cuda  --visual Grad_Cam 
 
 "1. vit_rollout"
 #python vit_explain.py --image_path "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/vit_visualization/examples/input.png" --head_fusion "min" --discard_ratio 0.8 
@@ -76,7 +75,7 @@ if __name__ == '__main__':
     parser.add_argument('--model_name', default='deit', type=str, help='data name') 
     parser.add_argument('--use_cuda', action='store_true', default=False,
                         help='Use NVIDIA GPU acceleration')
-    parser.add_argument('--image_path', type=str, default='./vit_visualization/input.png',
+    parser.add_argument('--image_path', type=str, default='/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/input.png',
                         help='Input image path')
     parser.add_argument('--head_fusion', type=str, default='max',
                         help='How to fuse the attention heads for attention rollout. \
@@ -161,9 +160,7 @@ if __name__ == '__main__':
     if args.use_cuda:
         images = images.cuda() # RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!
         labels = labels.cuda()
-    clean_acc = accuracy(fmodel, images, labels)
-    print(f"clean accuracy:  {clean_acc * 100:.1f} %")
-    
+   
     epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
     #%% "Attack" 
     #######################################################################################################################
@@ -173,7 +170,7 @@ if __name__ == '__main__':
         print(epsilons)
         raw_advs, clipped_advs, success = attack(fmodel, images, labels, epsilons=epsilons)
         # calculate and report the robust accuracy (the accuracy of the model when it is attacked)
-        robust_accuracy = 1 - success.float().mean(axis=-1) # succes of Attack
+        #robust_accuracy = 1 - success.float().mean(axis=-1) # succes of Attack
         print("robust accuracy for perturbations with")
         for epsilon, acc, advs_ in zip(epsilons, robust_accuracy, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
             print(f"  Linf norm ≤ {epsilon:<6}: {acc.item() * 100:4.1f} %")
@@ -207,7 +204,7 @@ if __name__ == '__main__':
             
             if args.visual == 'Grad_Cam':
                 #target_layer = model._conv_head
-                target_layer = model.features.conv
+                target_layers = model.features.conv
                 input_tensor  = images
                 targets = labels
                 # Construct the CAM object once, and then re-use it on many images:
