@@ -381,4 +381,29 @@ PGD: ex. confident on wrong prediction.
 "Q5. Increasing the Transformer Blocks improve robustness? (model size)? 
 : Compare results of ViT and CNNs
 
-#=================================================
+#===============================================
+
+#2%%
+   #target_layer = model._conv_head
+   target_layers = [model.features.conv]
+   #rgb_img = np.float32(img) / 255
+   import cv2
+   rgb_img = np.float32(cv2.resize(img, (224, 224))) / 255
+   imgs = img.resize((224,224))
+   #input_tensor = preprocess_image(rgb_img,
+   #                mean=[0.485, 0.456, 0.406],
+   #                std=[0.229, 0.224, 0.225])
+   input_tensor  = images
+   targets = [ClassifierOutputTarget(263)]
+   # Construct the CAM object once, and then re-use it on many images:
+   cam = GradCAM(model=model, target_layers=target_layers, use_cuda=args.use_cuda)
+   rgb_img = cv2.imread(args.image_path, 1)[:, :, ::-1]
+   rgb_img = np.float32(rgb_img) / 255
+   rgb_img.resize((224, 224,3))
+   grayscale_cam = cam(input_tensor=input_tensor, targets=targets)
+
+   # In this example grayscale_cam has only one image in the batch:
+   grayscale_cam = grayscale_cam[0, :]     
+   visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
+   Image.fromarray(visualization)              
+

@@ -66,12 +66,14 @@ if __name__ == '__main__':
           # ResNet50-swsl pre-trained on IG-1B-Targeted (Mahajan et al. (2018)) using semi-weakly supervised methods (Yalniz et al. (2019))
         #elif args.model_name == 'mobilenet3':
          #   model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
-            
+        elif args.model_name == 'VGG':  # 80
+            model = models.vgg19(pretrained=True).eval().to(device) 
+        
         elif args.model_name == 'efficient':  #  80.4
             model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
             #model = timm.create_model('efficientnet_b0', pretrained=True)
-            from efficientnet_pytorch import EfficientNet
-            model = EfficientNet.from_pretrained('efficientnet-b0').eval().to(device)
+            #from efficientnet_pytorch import EfficientNet
+            #model = EfficientNet.from_pretrained('efficientnet-b0').eval().to(device)
             
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  

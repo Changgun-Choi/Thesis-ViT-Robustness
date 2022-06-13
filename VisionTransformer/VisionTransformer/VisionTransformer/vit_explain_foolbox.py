@@ -1,7 +1,7 @@
 "https://jacobgil.github.io/deeplearning/vision-transformer-explainability"
 #set PYTHONPATH="C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #cd C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
-#python vit_explain_foolbox.py --model_name efficient --attack_name LinfPGD --use_cuda  --visual Grad_Cam 
+#python vit_explain_foolbox.py --model_name efficient --attack_name LinfPGD --visual Grad_Cam --use_cuda True
 
 "1. vit_rollout"
 #python vit_explain.py --image_path "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/vit_visualization/examples/input.png" --head_fusion "min" --discard_ratio 0.8 
@@ -50,8 +50,8 @@ from timm.models.layers import trunc_normal_
 "Grad Cam"
 from pytorch_grad_cam import GradCAM, ScoreCAM, GradCAMPlusPlus, AblationCAM, XGradCAM, EigenCAM, FullGrad
 from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
-from pytorch_grad_cam.utils.image import show_cam_on_image
-
+from pytorch_grad_cam.utils.image import show_cam_on_image, preprocess_image
+from grad_cam import GradCam,GuidedBackpropReLUModel,show_cams,show_gbs,preprocess_image
 #https://www.kaggle.com/code/meaninglesslives/efficientnet-gradcam-comparison-to-other-models/notebook
 #%%
 def get_args(): 
@@ -72,11 +72,11 @@ def show_mask_on_image(img, mask):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser() 
     parser.add_argument('--attack_name', default='LinfPGD', type=str, help='attack name') 
-    parser.add_argument('--model_name', default='deit', type=str, help='data name') 
+    parser.add_argument('--model_name', default='vit', type=str, help='data name') 
     parser.add_argument('--use_cuda', action='store_true', default=False,
                         help='Use NVIDIA GPU acceleration')
-    parser.add_argument('--image_path', type=str, default='/home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/input.png',
-                        help='Input image path')
+    parser.add_argument('--image_path', type=str, default='C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/Grad-CAM-pytorch/input.png',
+                        help='Input image path') 
     parser.add_argument('--head_fusion', type=str, default='max',
                         help='How to fuse the attention heads for attention rollout. \
                         Can be mean/max/min')  # mean/max/min
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     args.use_cuda = args.use_cuda and torch.cuda.is_available()
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu") 
-    #args.image_path = "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/corgie.jpg"
+    #args.image_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/Grad-CAM-pytorch/input.png'
     
     #%%
     with torch.no_grad():
@@ -101,16 +101,24 @@ if __name__ == '__main__':
             model = torchvision.models.resnet18(pretrained=True).eval().to(device)
             
         elif args.model_name == 'resnet50': # 80.53
-            model = timm.create_model('resnet50',  pretrained=True).eval().to(device)
+            model = timm.create_model('resnet50',  pretrained=True).to(device)
           # ResNet50-swsl pre-trained on IG-1B-Targeted (Mahajan et al. (2018)) using semi-weakly supervised methods (Yalniz et al. (2019))
         #elif args.model_name == 'mobilenet3':
          #   model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
+        elif args.model_name == 'VGG':  # 80
+            model = models.vgg19(pretrained=True).eval().to(device)  # Not Eval
+            blob_name = 'features'
+            target_layer_names=['4','20','36']
+            activation_layer_name = 'ReLU'
             
         elif args.model_name == 'efficient':  # 80
-            model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
+            #model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
             #model = timm.create_model('efficientnet_b0', pretrained=True)
-            #from efficientnet_pytorch import EfficientNet
-            #model = EfficientNet.from_pretrained('efficientnet-b0') 
+            from efficientnet_pytorch import EfficientNet
+            model = EfficientNet.from_pretrained('efficientnet-b0').eval().to(device)
+            blob_name = '_blocks'
+            target_layer_names=['1','10','15']
+            activation_layer_name = 'MemoryEfficientSwish'
       
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
@@ -143,6 +151,8 @@ if __name__ == '__main__':
         model = model.cuda()
 #%%
     preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)
+    #preprocessing = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], axis=-3)
+    "MODEL - .cuda() "
     fmodel = PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)  # Defining shape of data to be injected into Model # bounds of the input space (before the preprocessing).
     #images, labels = ep.astensors(*samples(fmodel, dataset="imagenet", batchsize=1)) # [1,3,224,224] Batchsize = 1 for Explain
     #images, labels = fb.utils.samples(fmodel, dataset='imagenet', batchsize=1)
@@ -152,7 +162,7 @@ if __name__ == '__main__':
         transforms.ToTensor()])
     
     img = Image.open(args.image_path)
-    img = img.resize((224, 224))     # [224,224]
+    #img = img.resize((224, 224))     # [224,224]
     images = transform(img).unsqueeze(0)  # [1,3,224,224]  # 3: RGB    
     #"label is added"
     labels = torch.tensor([263])             #
@@ -168,56 +178,82 @@ if __name__ == '__main__':
         attack = LinfPGD()
         print("epsilons")
         print(epsilons)
+        #images = inputs
         raw_advs, clipped_advs, success = attack(fmodel, images, labels, epsilons=epsilons)
-        # calculate and report the robust accuracy (the accuracy of the model when it is attacked)
-        #robust_accuracy = 1 - success.float().mean(axis=-1) # succes of Attack
-        print("robust accuracy for perturbations with")
-        for epsilon,  advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
-            #print(f"  Linf norm ≤ {epsilon:<6}: {acc.item() * 100:4.1f} %")
-            #acc2 = accuracy(fmodel, advs_, labels) 
-            #print(f"  Linf norm ≤ {epsilon:<6}: {acc2 * 100:4.1f} %")
-            #print("    perturbation sizes:")
-            #perturbation_sizes = (advs_ - images).norms.linf(axis=(1, 2, 3)).numpy()
-            #print("    ", str(perturbation_sizes).replace("\n", "\n" + "    "))
-            #if acc2 == 0:
-            #    break
-####################################################################################################################
+        
+        "calculate and report the robust accuracy (the accuracy of the model when it is attacked)"
+        for epsilon, advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
             original_img_view = images.squeeze(0).detach().cpu()  #[3,224,224]
             original_img_view = original_img_view.transpose(0,2).transpose(0,1).numpy()  #[224,224,3]
             "clipped_advs"
-            perturbed_data = advs_ 
+            perturbed_data = advs_  # advs_
             perturbed_data_view = perturbed_data.squeeze(0).detach().cpu()
             perturbed_data_view = perturbed_data_view.transpose(0,2).transpose(0,1).numpy()
         
             #plt.imshow(perturbed_data_view)
-        
             # ## 원본과 적대적 예제 비교
             f, a = plt.subplots(1, 2, figsize=(10, 10))
             # 원본
             #a[0].set_title(prediction_name)
-            a[0].imshow(original_img_view)
-        
-      
+            #a[0].imshow(original_img_view)        
             #a[1].set_title(perturbed_prediction_name)
-            a[1].imshow(original_img_view)
-            plt.show()
+            #a[1].imshow(original_img_view)
+            #plt.show()
             
             if args.visual == 'Grad_Cam':
-                #target_layer = model._conv_head
-                target_layers = model.features.conv
-                input_tensor  = images
-                targets = labels
+                #advs_ = iter(clipped_advs).__next__()  # For one Testset
+                "Grad_Cam - model.cpu(): use_cuda=False"
+                model = model.cpu()  
+                advs_ex = advs_.cpu() 
+              
+                grad_cam = GradCam(model=model, blob_name = blob_name, target_layer_names=target_layer_names, use_cuda=False)
+                img = cv2.imread(args.image_path, 1)             
+                img = np.float32(cv2.resize(img, (224, 224))) / 255
+                inputs = preprocess_image(img) 
+                
+                #advs_ex.shape # # torch.Size([1, 3, 224, 224])
+                #inputs.shape # torch.Size([1, 3, 224, 224])
+                #advs_ex - inputs
+                "Adversarial"
+                inputs = advs_ex
+                # If None, returns the map for the highest scoring category. Otherwise, targets the requested index.
+                target_index = None
+                mask_dic = grad_cam(inputs, target_index)
+                # Model, inputs, use_cuda=False -> CPU: Otherwise, Error Expected 4-dimensional input for 4-dimensional weight
+                show_cams(img, mask_dic, epsilon, args.model_name)
+                
+                #gb_model = GuidedBackpropReLUModel(model=model, activation_layer_name = activation_layer_name, use_cuda=False)
+                #show_gbs(inputs, gb_model, target_index, mask_dic)
+            
+            elif args.visual == 'Grad_Cam_2':
+               #############################################
+                #target_layer = [model._conv_head] # efficient
+                #target_layers = [model.features.conv]
+                target_layer = [model.layer4[-1]]  # resnet50
+                input_tensor = inputs.cpu()
+                model = model.cpu() 
+
+                #rgb_img = np.float32(img) / 255
+                import cv2
+                rgb_img = cv2.imread(args.image_path, 1)[:, :, ::-1]          
+                rgb_img = np.float32(rgb_img) / 255
+                #rgb_img = np.float32(cv2.resize(rgb_img, (224, 224))) / 255
+                input_tensor = preprocess_image(rgb_img).cpu()
+                #input_tensor  = images[model.layer4[-1]]
+                targets = [ClassifierOutputTarget(263)]
+                
                 # Construct the CAM object once, and then re-use it on many images:
                 cam = GradCAM(model=model, target_layers=target_layers, use_cuda=args.use_cuda)
-                rgb_img = cv2.imread(args.image_path, 1)[:, :, ::-1]
-                rgb_img = np.float32(rgb_img) / 255
-                
+                #rgb_img = cv2.imread(args.image_path, 1)[:, :, ::-1]
+                #rgb_img = np.float32(rgb_img) / 255
+                #rgb_img.resize((224, 224,3))
                 grayscale_cam = cam(input_tensor=input_tensor, targets=targets)
-
+ 
                 # In this example grayscale_cam has only one image in the batch:
                 grayscale_cam = grayscale_cam[0, :]     
                 visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
-            
+                Image.fromarray(visualization)    
+                    
             elif args.visual == 'ViT_vis':
                             
                 "Original Roll_out"
@@ -236,20 +272,20 @@ if __name__ == '__main__':
                     grad_rollout = VITAttentionGradRollout(model, discard_ratio=args.discard_ratio)
                     mask = grad_rollout(perturbed_data, args.category_index)
                     name = "grad_rollout_{}_{}_{:.3f}_{}_{}.png".format(args.model_name, args.category_index, args.discard_ratio, args.head_fusion, epsilon)
-
+                # Roll_out for Adversal Examples
+                np_img = img.resize((224,224),Image.ANTIALIAS)
+                np_img = np.array(img)[:, :, ::-1]
+                mask = cv2.resize(mask, (np_img.shape[1], np_img.shape[0]))
+                mask = show_mask_on_image(np_img, mask)
+                #cv2.imshow("Input Image", np_img)
+                cv2.imshow(name, mask)
+                #cv2.imwrite("input.png", np_img)
+                cv2.imwrite("C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/results"+ " " + name, mask)
+                #"./vit_visualization"+ " " + name
+                cv2.waitKey(-1)   
             
     
-            # Roll_out for Adversal Examples
-            np_img = img.resize((224,224),Image.ANTIALIAS)
-            np_img = np.array(img)[:, :, ::-1]
-            mask = cv2.resize(mask, (np_img.shape[1], np_img.shape[0]))
-            mask = show_mask_on_image(np_img, mask)
-            #cv2.imshow("Input Image", np_img)
-            cv2.imshow(name, mask)
-            #cv2.imwrite("input.png", np_img)
-            cv2.imwrite("C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/results"+ " " + name, mask)
-            #"./vit_visualization"+ " " + name
-            cv2.waitKey(-1)
+                 
 #%%
     elif args.attack_name == 'multiple_attacks': 
         #images, labels = ep.astensors(*samples(fmodel, dataset="imagenet", batchsize=1))  ############### Batchsize = 1 for Explain
@@ -339,5 +375,9 @@ if __name__ == '__main__':
         cv2.imwrite("C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/vit_visualization/"+ " " + name, mask)
         "./vit_visualization"+ " " + name
         cv2.waitKey(-1)
+        
+        
+#%%
 
+             
 #RuntimeError: The size of tensor a (197) must match the size of tensor b (577) at non-singleton dimension 1
