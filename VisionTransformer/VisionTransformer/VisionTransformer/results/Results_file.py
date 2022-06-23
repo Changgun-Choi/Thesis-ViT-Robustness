@@ -78,6 +78,14 @@ robust accuracy for perturbations with
   #Linf norm ≤ 0.001176470588235294: 24.1 %
   #Linf norm ≤ 0.00392156862745098:  0.4 %
   #Linf norm ≤ 0.01568627450980392:  0.0 %
+"PGD: VGG"
+clean accuracy:  73.0 %
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 73.0 %
+  Linf norm ≤ 0.0003921568627450981: 58.5 %
+  Linf norm ≤ 0.001176470588235294: 30.0 %
+  Linf norm ≤ 0.00392156862745098:  1.7 %
+  Linf norm ≤ 0.01568627450980392:  0.1 %
     
 "PGD: EfficientNet"
   Linf norm ≤ 0     : 80.4 %
@@ -162,7 +170,7 @@ robust accuracy for perturbations with
 #%%
 "Test data: 800 test dataset, 5 Models tested "
 # Adversarial attack: maximizing the inner optimization problem
-"Accuracy" : Vit >  Swin > Hybrid > DeiT > Resnet50> efficient > ResNet
+"Accuracy" : Vit >  Swin > Hybrid > DeiT > Resnet50> efficient > VGG> ResNet
 FGSM:       Swin > DeiT > "Hybrid" > ViT > "ResNet_50" > EfficientNet > ResNet  
 
 "PGD:      EfficientNet > ViT > ResNet_50 > DeiT > Swin > ResNet"
@@ -349,8 +357,8 @@ PGD:
 : e ViTs learn less high-frequency features
  One possible explanation is that the introduced modules improve the classification accuracy 
 by remembering the low-level structures that repeatedly appear in the training dataset. 
-These structures
-such as edges and lines are high-frequent and sensitive to perturbations. Learning such featuresmakes the model more vulnerable to adversarial attacks
+These structures such as edges and lines are high-frequent and sensitive to perturbations. 
+Learning such featuresmakes the model more vulnerable to adversarial attacks
 
 1. PGD: ViT is more robust than Hybrid and general CNNs except "EfficientNet"
 "Q. Robustness of Hybrid " - How Convolution layer affects ViT robustness?
@@ -367,6 +375,7 @@ PGD              :  EfficientNet > Resnet50
 
 "Q CNN - Purtubated images(around 200) - Overshoot in the edges like rings"
    ViT - How does Purtubated images look like??
+   
 - "Q. Visualization of CNNs??" - GradCam ++
 ex. CNNs - Strided COnvloution - attacks higlyfrequency  - attacking Pooling operation - changes globally 
 
@@ -382,28 +391,3 @@ PGD: ex. confident on wrong prediction.
 : Compare results of ViT and CNNs
 
 #===============================================
-
-#2%%
-   #target_layer = model._conv_head
-   target_layers = [model.features.conv]
-   #rgb_img = np.float32(img) / 255
-   import cv2
-   rgb_img = np.float32(cv2.resize(img, (224, 224))) / 255
-   imgs = img.resize((224,224))
-   #input_tensor = preprocess_image(rgb_img,
-   #                mean=[0.485, 0.456, 0.406],
-   #                std=[0.229, 0.224, 0.225])
-   input_tensor  = images
-   targets = [ClassifierOutputTarget(263)]
-   # Construct the CAM object once, and then re-use it on many images:
-   cam = GradCAM(model=model, target_layers=target_layers, use_cuda=args.use_cuda)
-   rgb_img = cv2.imread(args.image_path, 1)[:, :, ::-1]
-   rgb_img = np.float32(rgb_img) / 255
-   rgb_img.resize((224, 224,3))
-   grayscale_cam = cam(input_tensor=input_tensor, targets=targets)
-
-   # In this example grayscale_cam has only one image in the batch:
-   grayscale_cam = grayscale_cam[0, :]     
-   visualization = show_cam_on_image(rgb_img, grayscale_cam, use_rgb=True)
-   Image.fromarray(visualization)              
-

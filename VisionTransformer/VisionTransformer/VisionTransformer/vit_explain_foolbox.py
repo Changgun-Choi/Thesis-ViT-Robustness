@@ -1,13 +1,16 @@
 "https://jacobgil.github.io/deeplearning/vision-transformer-explainability"
 #set PYTHONPATH="C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #cd C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
-#python vit_explain_foolbox.py --model_name efficient --attack_name LinfPGD --visual Grad_Cam --use_cuda True
+#python vit_explain_foolbox.py --model_name efficient --attack_name LinfPGD --use_cuda --category_index 263
+
 
 "1. vit_rollout"
 #python vit_explain.py --image_path "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/vit_visualization/examples/input.png" --head_fusion "min" --discard_ratio 0.8 
+#python vit_explain_foolbox.py --model_name deit --attack_name LinfPGD --visual ViT_vis --use_cuda --head_fusion "max" --discard_ratio 0.9  --category_index 263
 
 "2. Gradient Attention Rollout for class specific explainability"
-#python vit_explain.py --head_fusion "min" --discard_ratio 0.8 --category_index 243
+#python vit_explain.py --head_fusion "min" --discard_ratio 0.8 --category_index 243 
+" Dog (category 243)"
 # We can multiply the attention with the gradient of the target class output, and take the average among the attention heads 
 # (while masking out negative attentions) to keep only attention that contributes to the target category (or categories).
 
@@ -82,10 +85,10 @@ if __name__ == '__main__':
                         Can be mean/max/min')  # mean/max/min
     parser.add_argument('--discard_ratio', type=float, default=0.9,
                         help='How many of the lowest 14x14 attention paths should we discard')
-    parser.add_argument('--category_index', type=int, default=None,
+    parser.add_argument('--category_index', type=int, default=None, # 263
                         help='The category index for gradient rollout')
     
-    parser.add_argument('--visual', type=str, default='Grad_Cam')
+    parser.add_argument('--visual', type=str, default=None)
 
     "If category_index isn't specified, Attention Rollout will be used"
    
@@ -101,7 +104,7 @@ if __name__ == '__main__':
             model = torchvision.models.resnet18(pretrained=True).eval().to(device)
             
         elif args.model_name == 'resnet50': # 80.53
-            model = timm.create_model('resnet50',  pretrained=True).to(device)
+            model = timm.create_model('resnet50',  pretrained=True).eval().to(device)
           # ResNet50-swsl pre-trained on IG-1B-Targeted (Mahajan et al. (2018)) using semi-weakly supervised methods (Yalniz et al. (2019))
         #elif args.model_name == 'mobilenet3':
          #   model = timm.create_model('mobilenetv3_large_100',  pretrained=True).eval().to(device)
@@ -122,6 +125,7 @@ if __name__ == '__main__':
       
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
+            target_layers = [model.blocks[-1].norm1]
             
         elif args.model_name == 'vit_hybrid': #   
             "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py
@@ -150,8 +154,8 @@ if __name__ == '__main__':
     if args.use_cuda:
         model = model.cuda()
 #%%
-    preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)
-    #preprocessing = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], axis=-3)
+    #preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)
+    preprocessing = dict(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], axis=-3)
     "MODEL - .cuda() "
     fmodel = PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)  # Defining shape of data to be injected into Model # bounds of the input space (before the preprocessing).
     #images, labels = ep.astensors(*samples(fmodel, dataset="imagenet", batchsize=1)) # [1,3,224,224] Batchsize = 1 for Explain
@@ -162,16 +166,23 @@ if __name__ == '__main__':
         transforms.ToTensor()])
     
     img = Image.open(args.image_path)
-    #img = img.resize((224, 224))     # [224,224]
+    img = img.resize((224, 224))     # [224,224]
     images = transform(img).unsqueeze(0)  # [1,3,224,224]  # 3: RGB    
-    #"label is added"
-    labels = torch.tensor([263])             #
     
+    #img = cv2.imread(args.image_path, 1)             
+    #img = np.float32(cv2.resize(img, (224, 224))) / 255
+    #images = preprocess_image(img)
+    #images.requires_grad = False
+
+    #labels = torch.tensor([args.category_index])  #243   # 263         #
+    labels = torch.tensor([263])     # 263         #
+ 
     if args.use_cuda:
         images = images.cuda() # RuntimeError: Expected all tensors to be on the same device, but found at least two devices, cuda:0 and cpu!
         labels = labels.cuda()
    
-    epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
+    epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255] 
+    #epsilons = [5]
     #%% "Attack" 
     #######################################################################################################################
     if args.attack_name == 'LinfPGD':  # single adversarial attack (Linf PGD)
@@ -180,40 +191,63 @@ if __name__ == '__main__':
         print(epsilons)
         #images = inputs
         raw_advs, clipped_advs, success = attack(fmodel, images, labels, epsilons=epsilons)
-        
+        examples = []
         "calculate and report the robust accuracy (the accuracy of the model when it is attacked)"
         for epsilon, advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
+            #advs_ = iter(clipped_advs).__next__()  # For one Testset
+            #epsilon = 10/255
+            
             original_img_view = images.squeeze(0).detach().cpu()  #[3,224,224]
             original_img_view = original_img_view.transpose(0,2).transpose(0,1).numpy()  #[224,224,3]
             "clipped_advs"
             perturbed_data = advs_  # advs_
             perturbed_data_view = perturbed_data.squeeze(0).detach().cpu()
             perturbed_data_view = perturbed_data_view.transpose(0,2).transpose(0,1).numpy()
-        
+            #perturbed_data_view = perturbed_data.squeeze().detach().cpu().numpy()
+            examples.append(perturbed_data_view)
             #plt.imshow(perturbed_data_view)
             # ## 원본과 적대적 예제 비교
-            f, a = plt.subplots(1, 2, figsize=(10, 10))
+            #f, a = plt.subplots(1, 2, figsize=(10, 10))
             # 원본
             #a[0].set_title(prediction_name)
             #a[0].imshow(original_img_view)        
             #a[1].set_title(perturbed_prediction_name)
-            #a[1].imshow(original_img_view)
+            #a[1].imshow(perturbed_data_view)
             #plt.show()
+            #cv2.imwrite("C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/results/"+ " " + name, perturbed_data_view)
+            #name = "Perturbed_{}_{}.png".format(args.model_name, epsilon)
+            #cv2.imshow(name, perturbed_data_view)
+            #cv2.imwrite("input.png", np_img)
+            #cv2.imwrite("C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/results/"+ " " + name, perturbed_data_view)
+            #"./vit_visualization"+ " " + name
+          
             
-            if args.visual == 'Grad_Cam':
+            if args.visual == 'Grad_Cam': # Global Average Pooling → 각 Feature별 평균 값을 구함
+            
+                model = EfficientNet.from_pretrained('efficientnet-b0')
+                grad_cam = GradCam(model=model, blob_name = '_blocks', target_layer_names=['1','10','15'], use_cuda=False)
+                img = cv2.imread(args.image_path, 1)
+                img = np.float32(cv2.resize(img, (224, 224))) / 255
+                inputs = preprocess_image(img)
+                # If None, returns the map for the highest scoring category.
+                # Otherwise, targets the requested index.
+                target_index = 263
+                mask_dic = grad_cam(inputs, target_index)
+                show_cams(img, mask_dic, epsilon, 'kim')
+                gb_model = GuidedBackpropReLUModel(model=model, activation_layer_name = 'MemoryEfficientSwish', use_cuda=False)
+                show_gbs(inputs, gb_model, target_index, mask_dic)
+
+                             
+                
+                "Gradient: Total amount of effect of input K on Class A"
                 #advs_ = iter(clipped_advs).__next__()  # For one Testset
                 "Grad_Cam - model.cpu(): use_cuda=False"
                 model = model.cpu()  
                 advs_ex = advs_.cpu() 
               
                 grad_cam = GradCam(model=model, blob_name = blob_name, target_layer_names=target_layer_names, use_cuda=False)
-                img = cv2.imread(args.image_path, 1)             
-                img = np.float32(cv2.resize(img, (224, 224))) / 255
-                inputs = preprocess_image(img) 
-                
                 #advs_ex.shape # # torch.Size([1, 3, 224, 224])
                 #inputs.shape # torch.Size([1, 3, 224, 224])
-                #advs_ex - inputs
                 "Adversarial"
                 inputs = advs_ex
                 # If None, returns the map for the highest scoring category. Otherwise, targets the requested index.
@@ -221,15 +255,15 @@ if __name__ == '__main__':
                 mask_dic = grad_cam(inputs, target_index)
                 # Model, inputs, use_cuda=False -> CPU: Otherwise, Error Expected 4-dimensional input for 4-dimensional weight
                 show_cams(img, mask_dic, epsilon, args.model_name)
-                
-                #gb_model = GuidedBackpropReLUModel(model=model, activation_layer_name = activation_layer_name, use_cuda=False)
-                #show_gbs(inputs, gb_model, target_index, mask_dic)
+                gb_model = GuidedBackpropReLUModel(model=model, activation_layer_name = activation_layer_name, use_cuda=False)
+                show_gbs(inputs, gb_model, target_index, mask_dic)
             
             elif args.visual == 'Grad_Cam_2':
                #############################################
                 #target_layer = [model._conv_head] # efficient
                 #target_layers = [model.features.conv]
-                target_layer = [model.layer4[-1]]  # resnet50
+                #target_layer = [model.layer4[-1]]  # resnet50
+                target_layers = [model.blocks[-1].norm1]
                 input_tensor = inputs.cpu()
                 model = model.cpu() 
 
@@ -262,7 +296,6 @@ if __name__ == '__main__':
                     print("Doing Attention Rollout")
                     #attention_rollout = VITAttentionRollout(model, head_fusion=args.head_fusion, discard_ratio=args.discard_ratio)
                     #mask = attention_rollout(perturbed_data)
-                    
                     attention_rollout = VITAttentionRollout(model, head_fusion=args.head_fusion, discard_ratio=args.discard_ratio)
                     mask = attention_rollout(perturbed_data) ###############
                     
@@ -282,7 +315,22 @@ if __name__ == '__main__':
                 #cv2.imwrite("input.png", np_img)
                 cv2.imwrite("C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/results"+ " " + name, mask)
                 #"./vit_visualization"+ " " + name
-                cv2.waitKey(-1)   
+                cv2.waitKey(-1) 
+        cnt = 0
+        plt.figure(figsize=(8,10))
+        for i in range(len(epsilons)):
+            #for j in range(len(examples[i])):
+                cnt += 1
+                plt.subplot(len(epsilons),1,cnt)
+                plt.xticks([], [])
+                plt.yticks([], [])
+                #if j == 0: 
+                #plt.ylabel("Eps: {}".format(i), fontsize=14)
+                ex = examples[i]
+                #plt.title("{} -> {}".format(orig, adv))
+                plt.imshow(ex, cmap="gray")
+        plt.tight_layout()
+        plt.show()   
             
     
                  
@@ -379,5 +427,4 @@ if __name__ == '__main__':
         
 #%%
 
-             
 #RuntimeError: The size of tensor a (197) must match the size of tensor b (577) at non-singleton dimension 1
