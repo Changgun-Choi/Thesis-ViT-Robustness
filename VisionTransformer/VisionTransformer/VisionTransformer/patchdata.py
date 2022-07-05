@@ -70,7 +70,14 @@ class Flattened2Dpatches:
             #attackloader = DataLoader(att_test, batch_size=64, shuffle=False)
             
         elif self.dataname == 'imagenet':
-            pass  # Add later if you wanna use it
+            #pass  # Add later if you wanna use it
+            data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
+         
+            testset = torchvision.datasets.ImageNet('./data', train=True,  download=True, transform=train_transform)
+            sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.01 : 500
+            valset = torch.utils.data.Subset(testset, sample) 
+            val_loader = torch.utils.data.DataLoader(valset, args.batch_size ,drop_last=True)
+            
 
         weights = self.make_weights(trainset.targets, len(trainset.classes))  # Class 확률을 가중치로 들어서 
                                                                              

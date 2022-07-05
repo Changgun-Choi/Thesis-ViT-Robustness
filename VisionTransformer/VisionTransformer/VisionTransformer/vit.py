@@ -1,6 +1,8 @@
 "Main py"
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #python vit.py --pretrained 1 --mode test --model_name vit
+#python vit.py --mode 'train' --model_name vit --num_classes 1000
+
 import os
 os.chdir('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer')
 
@@ -18,15 +20,18 @@ import matplotlib.pyplot as plt
 import numpy as np
 from torchvision import transforms
 import timm
-assert timm.__version__ == "0.3.2"
+#assert timm.__version__ == "0.3.2"
 import argparse ##############  Use in Terminal
 import time
 import datetime      # Calculate execution Time
+import gc
+gc.collect()
+torch.cuda.empty_cache()
 start = time.time()
 torch.manual_seed(0)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(de)
+    parser = argparse.ArgumentParser()
     parser.add_argument
 
 if __name__ == "__main__":
@@ -35,7 +40,7 @@ if __name__ == "__main__":
     parser.add_argument('--patch_size', default=4, type=int, help='patch size')           # Patch_size: 4
     parser.add_argument('--batch_size', default=128, type=int, help='batch size')   
     parser.add_argument('--save_acc', default=50, type=int, help='val acc')               # Start Saving from 50% accuracy
-    parser.add_argument('--epochs', default=501, type=int, help='training epoch')
+    parser.add_argument('--epochs', default=300, type=int, help='training epoch')
     parser.add_argument('--lr', default=2e-3, type=float, help='learning rate')
     parser.add_argument('--drop_rate', default=.1, type=float, help='drop rate')
     parser.add_argument('--weight_decay', default=0, type=float, help='weight decay')
@@ -108,7 +113,7 @@ if __name__ == "__main__":
             if val_acc > best_acc:  # 작으면 저장이 안되니까 Earlystopping 
                 best_acc = val_acc # best 보다 크면 replace
                 print('[%d] train loss: %.3f, validation acc %.2f - Save the best model' % (epoch, train_loss, val_acc))
-                torch.save(model.state_dict(), './model.pth')  # 계속 update 되는 것 
+                torch.save(model.state_dict(), './model_imagenet.pth')  # 계속 update 되는 것 
 
 #%% Test(Accuracy, Adversairal Attack)"
     else:

@@ -62,9 +62,11 @@ plt.imshow(original_img_view)
     'deit_tiny_distilled_patch16_224', 'deit_small_distilled_patch16_224',
     'deit_base_distilled_patch16_224', 'deit_base_patch16_384',
     'deit_base_distilled_patch16_384',]
-
+#%%
 #deit_small_distilled_patch16_224
-model = torch.hub.load('facebookresearch/deit:main','deit_small_distilled_patch16_224')
+#model = torch.hub.load('facebookresearch/deit:main','deit_small_distilled_patch16_224')
+model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
+
 # 4번째 부터 attack 성공 
 
 
@@ -95,8 +97,15 @@ loss.backward()
 
 #%% 1) fgsm_attack
 
-
-epsilons = [0, .05, .1, .15, .2, .25, .3]
+def softmax_activation(inputs): 
+    inputs = inputs.tolist()
+    exp_values = np.exp(inputs - np.max(inputs)) 
+    
+    # Normalize 
+    probabilities = exp_values / np.sum(exp_values)
+    return probabilities 
+#%%
+epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255] 
 # 이미지의 기울기값을 추출
 gradient = img_tensor.grad.data
 # FGSM 공격으로 적대적 예제 생성
@@ -111,9 +120,12 @@ for epsilon in epsilons:
     perturbed_prediction = output.max(1, keepdim=True)[1]
     perturbed_prediction_idx = perturbed_prediction.item()
     perturbed_prediction_name = idx2class[perturbed_prediction_idx]
-    print(output[:,263])
-    print("예측된 레이블 번호:", perturbed_prediction_idx)  # 예측된 레이블 번호: 172
-    print("레이블 이름:", perturbed_prediction_name)   # 레이블 이름: whippet
+    #print(output[:,263])
+    accuracy = np.max(softmax_activation(output), axis=1)
+    accuracy = round(accuracy[0], 2)
+    print("Accuracy on benign examples: {}%".format(accuracy * 100)) 
+    print("Predicted label:", perturbed_prediction_idx)  # 예측된 레이블 번호: 172
+    print("Predicted label name:", perturbed_prediction_name)   # 레이블 이름: whippet
 #%% Visualize 
 
 # 시각화를 위해 넘파이 행렬 변환

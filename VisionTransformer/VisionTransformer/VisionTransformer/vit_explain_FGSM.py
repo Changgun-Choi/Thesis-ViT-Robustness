@@ -42,7 +42,7 @@ import eagerpy as ep
 from foolbox import PyTorchModel, accuracy, samples
 from foolbox.attacks import LinfPGD
 import timm
-assert timm.__version__ == "0.3.2"
+#assert timm.__version__ == "0.3.2"
 from functools import partial
 from timm.models.vision_transformer import VisionTransformer, _cfg
 from timm.models.registry import register_model
