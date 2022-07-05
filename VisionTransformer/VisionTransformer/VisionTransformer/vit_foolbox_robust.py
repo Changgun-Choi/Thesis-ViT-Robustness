@@ -132,7 +132,7 @@ if __name__ == '__main__':
             timm.list_models(pretrained=True) 
             timm.list_models('*resnet50*')
        
-            
+            #%%
  
     preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
     fmodel = PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
@@ -166,24 +166,26 @@ if __name__ == '__main__':
         
     #images, labels = ep.astensors(*samples(fmodel, dataset="imagenet", batchsize=8))  # samples() has only 20 samples and repeats itself if batchsize > 20
     #clean_acc = accuracy(fmodel, images, labels)
-       
+       #%%
     if args.attack_name == 'PGD':  # FGSM을 step 단위로 나눠서 사용하는 방식의 공격
         "default settinig for steps"
         if args.PGD_change == 'no': 
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
             accuracy = 0 
-            success = torch.zeros(len(epsilons),args.batch_size).cuda()
+            success = torch.zeros(len(epsilons),args.batch_size).to(device)
 
             for batch_idx, (image, label) in enumerate(val_loader):
                 print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
-                images = image.cuda()
-                labels = label.cuda()
+                images = image.to(device)
+                labels = label.to(device)
                 #images, labels = ep.astensors(images, labels)
                 clean_acc = get_acc(fmodel, images, labels)
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 
                 for epsilon, advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
                     #advs_ = advs_.requires_grad_(True)    
                     output = fmodel(advs_)
+             
+                    
                     perturbed_prediction = output.max(1, keepdim=True)[1]
                     perturbed_prediction_idx = perturbed_prediction.item()
                     perturbed_prediction_name = idx2class[perturbed_prediction_idx]

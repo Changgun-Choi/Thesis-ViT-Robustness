@@ -55,6 +55,79 @@ def softmax_activation(inputs):
     probabilities = exp_values / np.sum(exp_values)
     return probabilities 
 
+import matplotlib.patches as mpatches
+def calc_bins(preds):
+  # Assign each prediction to a bin
+  num_bins = 10
+  bins = np.linspace(0.1, 1, num_bins)
+  binned = np.digitize(preds, bins)
+
+  # Save the accuracy, confidence and size of each bin
+  bin_accs = np.zeros(num_bins)
+  bin_confs = np.zeros(num_bins)
+  bin_sizes = np.zeros(num_bins)
+
+  for bin in range(num_bins):
+    bin_sizes[bin] = len(preds[binned == bin])
+    if bin_sizes[bin] > 0:
+      bin_accs[bin] = (labels_oneh[binned==bin]).sum() / bin_sizes[bin]
+      bin_confs[bin] = (preds[binned==bin]).sum() / bin_sizes[bin]
+
+  return bins, binned, bin_accs, bin_confs, bin_sizes
+
+
+def get_metrics(preds):
+  ECE = 0
+  MCE = 0
+  bins, _, bin_accs, bin_confs, bin_sizes = calc_bins(preds)
+
+  for i in range(len(bins)):
+    abs_conf_dif = abs(bin_accs[i] - bin_confs[i])
+    ECE += (bin_sizes[i] / sum(bin_sizes)) * abs_conf_dif
+    MCE = max(MCE, abs_conf_dif)
+
+  return ECE, MCE
+def draw_reliability_graph(preds):
+  ECE, MCE = get_metrics(preds)
+  bins, _, bin_accs, _, _ = calc_bins(preds)
+
+  fig = plt.figure(figsize=(8, 8))
+  ax = fig.gca()
+
+  # x/y limits
+  ax.set_xlim(0, 1.05)
+  ax.set_ylim(0, 1)
+
+  # x/y labels
+  plt.xlabel('Confidence')
+  plt.ylabel('Accuracy')
+
+  # Create grid
+  ax.set_axisbelow(True) 
+  ax.grid(color='gray', linestyle='dashed')
+
+  # Error bars
+  plt.bar(bins, bins,  width=0.1, alpha=0.3, edgecolor='black', color='r', hatch='\\')
+
+  # Draw bars and identity line
+  plt.bar(bins, bin_accs, width=0.1, alpha=1, edgecolor='black', color='b')
+  plt.plot([0,1],[0,1], '--', color='gray', linewidth=2)
+
+  # Equally spaced axes
+  plt.gca().set_aspect('equal', adjustable='box')
+
+  # ECE and MCE legend
+  ECE_patch = mpatches.Patch(color='green', label='ECE = {:.2f}%'.format(ECE*100))
+  MCE_patch = mpatches.Patch(color='red', label='MCE = {:.2f}%'.format(MCE*100))
+  plt.legend(handles=[ECE_patch, MCE_patch])
+
+  #plt.show()
+  
+  plt.savefig('calibrated_network.png', bbox_inches='tight')
+
+#draw_reliability_graph(preds)
+
+
 #%%
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Vision Transformer')
@@ -133,7 +206,7 @@ if __name__ == '__main__':
             timm.list_models('*resnet50*')
        
             
- 
+ #%%
     preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
     fmodel = PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
     
@@ -163,7 +236,7 @@ if __name__ == '__main__':
             predictions = model(inputs).argmax(axis=-1)
             accuracy = (predictions == labels).float().mean()
             return accuracy.item() 
-        
+        #%%
     #images, labels = ep.astensors(*samples(fmodel, dataset="imagenet", batchsize=8))  # samples() has only 20 samples and repeats itself if batchsize > 20
     #clean_acc = accuracy(fmodel, images, labels)
        
@@ -172,40 +245,59 @@ if __name__ == '__main__':
         if args.PGD_change == 'no': 
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
             accuracy = 0 
-            success = torch.zeros(len(epsilons),args.batch_size).cuda()
-
+            success = torch.zeros(len(epsilons),args.batch_size).to(device) 
+            "New"
+            preds = []
+            labels_oneh = []
             for batch_idx, (image, label) in enumerate(val_loader):
                 print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
-                images = image.cuda()
-                labels = label.cuda()
+                images = image.to(device) 
+                labels = label.to(device) 
                 #images, labels = ep.astensors(images, labels)
                 clean_acc = get_acc(fmodel, images, labels)
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 
+                "label"
+                label_oneh = torch.nn.functional.one_hot(labels, num_classes=1000)
+                label_oneh = label_oneh.cpu().detach().numpy()
+               
                 for epsilon, advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
                     #advs_ = advs_.requires_grad_(True)    
                     output = fmodel(advs_)
-                    perturbed_prediction = output.max(1, keepdim=True)[1]
-                    perturbed_prediction_idx = perturbed_prediction.item()
-                    perturbed_prediction_name = idx2class[perturbed_prediction_idx]
-                    #print(output[:,263])
-                    accuracy = np.max(softmax_activation(output), axis=1)
-                    accuracy = round(accuracy[0], 2)
-                    print("Confidence: {}%_ {}".format(accuracy * 100, perturbed_prediction_name)) 
+                    sm = nn.Softmax(dim=1)
+                    pred = sm(output)
+                    pred = pred.cpu().detach().numpy()
+                    preds.extend(pred)
                     
+                   # perturbed_prediction = output.max(1, keepdim=True)[1]
+                   # perturbed_prediction_idx = perturbed_prediction.item()
+                  #  perturbed_prediction_name = idx2class[perturbed_prediction_idx]
+                   # #print(output[:,263])
+                 #   accuracy = np.max(softmax_activation(output), axis=1)
+                 #   accuracy = round(accuracy[0], 2)
+                  #  print("Confidence: {}%_ {}".format(accuracy * 100, perturbed_prediction_name)) 
+            
                 succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
                 success += succ
                 accuracy += clean_acc
+                "New"
+                preds.extend(pred)
+                labels_oneh.extend(label_oneh)
                 #print(success)
+            preds = np.array(preds).flatten()
+            labels_oneh = np.array(labels_oneh).flatten()
+            draw_reliability_graph(preds)
+            
             accuracy = accuracy / len(val_loader)
             print(f"clean accuracy:  {accuracy * 100:.1f} %") 
             success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
             robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
             print("robust accuracy for perturbations with")
-            for eps, acc in zip(epsilons, robust_accuracy):
+            for eps, acc in zip(epsilons, robust_accuracy, ):
                 print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   
             plt.figure(figsize=(5,5))
             plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
             plt.show()
+            #%%
         else: 
             "Different step_size"
             "defaults to 0.01 / 0.3"
