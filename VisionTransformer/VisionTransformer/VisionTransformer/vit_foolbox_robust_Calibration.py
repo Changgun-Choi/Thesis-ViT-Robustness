@@ -2,7 +2,7 @@
 # git stash
 # git pull
 # conda activate thesis
-# python vit_foolbox_robust_Calibration.py --model_name resnet50 --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+python vit_foolbox_robust_Calibration.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -122,13 +122,13 @@ def draw_reliability_graph(preds, epsilon, model_name):
   plt.legend(handles=[ECE_patch, MCE_patch])
 
   plt.show()
-  plt.savefig('calibrated_network_{}_{}'.format(epsilon*255, model_name), bbox_inches='tight')
+  plt.savefig('calibrated_network_{}_{}.png'.format(epsilon*255, model_name), bbox_inches='tight')
   print('ECE = {:.2f}%_{}_{}'.format(ECE*100, epsilon*255, model_name))
   print('MCE = {:.2f}%_{}_{}'.format(MCE*100, epsilon*255, model_name))
 
 #draw_reliability_graph(preds)
 
-
+'calibrated_network_{}_{}'.format(epsilon*255, args.model_name)
 #%%
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Vision Transformer')
