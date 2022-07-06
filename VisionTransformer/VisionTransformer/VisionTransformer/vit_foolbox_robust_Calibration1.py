@@ -2,7 +2,7 @@
 # git stash
 # git pull
 # conda activate thesis
-# python vit_foolbox_robust_Calibration.py --model_name resnet50 --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+# python vit_foolbox_robust.py --model_name resnet50 --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -87,7 +87,7 @@ def get_metrics(preds):
     MCE = max(MCE, abs_conf_dif)
 
   return ECE, MCE
-def draw_reliability_graph(preds, epsilon, model_name):
+def draw_reliability_graph(preds):
   ECE, MCE = get_metrics(preds)
   bins, _, bin_accs, _, _ = calc_bins(preds)
 
@@ -116,15 +116,14 @@ def draw_reliability_graph(preds, epsilon, model_name):
   # Equally spaced axes
   plt.gca().set_aspect('equal', adjustable='box')
 
-  # ECE and MCE legend_{}_{}
-  ECE_patch = mpatches.Patch(color='green', label='ECE = {:.2f}%_{}_{}'.format(ECE*100, epsilon*255, model_name))
-  MCE_patch = mpatches.Patch(color='red', label='MCE = {:.2f}%_{}_{}'.format(MCE*100, epsilon*255, model_name))
+  # ECE and MCE legend
+  ECE_patch = mpatches.Patch(color='green', label='ECE = {:.2f}%'.format(ECE*100))
+  MCE_patch = mpatches.Patch(color='red', label='MCE = {:.2f}%'.format(MCE*100))
   plt.legend(handles=[ECE_patch, MCE_patch])
 
-  plt.show()
-  plt.savefig('calibrated_network_{}_{}'.format(epsilon*255, model_name), bbox_inches='tight')
-  print('ECE = {:.2f}%_{}_{}'.format(ECE*100, epsilon*255, model_name))
-  print('MCE = {:.2f}%_{}_{}'.format(MCE*100, epsilon*255, model_name))
+  #plt.show()
+  
+  plt.savefig('calibrated_network.png', bbox_inches='tight')
 
 #draw_reliability_graph(preds)
 
@@ -240,50 +239,107 @@ if __name__ == '__main__':
         #%%
     #images, labels = ep.astensors(*samples(fmodel, dataset="imagenet", batchsize=8))  # samples() has only 20 samples and repeats itself if batchsize > 20
     #clean_acc = accuracy(fmodel, images, labels)
-    #epsilons = [0, 0.1/255] 
+    epsilons = [0, 0.1/255] 
     if args.attack_name == 'PGD':  # FGSM을 step 단위로 나눠서 사용하는 방식의 공격
-            "default settinig for steps"
-        
+        "default settinig for steps"
+        if args.PGD_change == 'no': 
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
-            #attack = fa.FGSM()
-            #accuracy = 0 
-            #args.batch_size = 5
-            #success = torch.zeros(len(epsilons),args.batch_size).to(device) 
+            attack = fa.FGSM()
+            accuracy = 0 
+            args.batch_size = 5
+            success = torch.zeros(len(epsilons),args.batch_size).to(device) 
             "New"
             #preds = torch.empty(len(epsilons),args.batch_size, 1000).to(device) 
             #preds = torch.zeros(len(epsilons),args.batch_size).to(device) 
-           
-            for epsilon in epsilons:
-                preds = []
-                labels_oneh = []
-                for batch_idx, (image, label) in enumerate(val_loader):
-                    print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
-                    images = image.to(device) 
-                    labels = label.to(device) 
-                    clean_acc = get_acc(fmodel, images, labels)
-                    raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilon) 
-                    "label"
-                    label_oneh = torch.nn.functional.one_hot(labels, num_classes=1000)
-                    label_oneh = label_oneh.cpu().detach().numpy()
-                    "Pred"
-                    output = fmodel(clipped_advs)
+            preds = []
+            labels_oneh = []
+            for batch_idx, (image, label) in enumerate(val_loader):
+                print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
+                images = image.to(device) 
+                labels = label.to(device) 
+                clean_acc = get_acc(fmodel, images, labels)
+                raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 
+                "label"
+                label_oneh = torch.nn.functional.one_hot(labels, num_classes=1000)
+                label_oneh = label_oneh.cpu().detach().numpy()
+                
+               
+                for epsilon, advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
+                    #advs_ = advs_.requires_grad_(True)    
+                    output = fmodel(advs_)
                     sm = nn.Softmax(dim=1)
                     pred = torch.unsqueeze(sm(output),0).cpu().detach().numpy()
-                    
                     preds.extend(pred)
-                    labels_oneh.extend(label_oneh)
+                   
                 
-                
-                preds = np.array(preds).flatten()
-                labels_oneh = np.array(labels_oneh).flatten()
-                draw_reliability_graph(preds, epsilon, args.model_name)
-  
-    
+                   # perturbed_prediction = output.max(1, keepdim=True)[1]
+                   # perturbed_prediction_idx = perturbed_prediction.item()
+                  #  perturbed_prediction_name = idx2class[perturbed_prediction_idx]
+                   # #print(output[:,263])
+                 #   accuracy = np.max(softmax_activation(output), axis=1)
+                 #   accuracy = round(accuracy[0], 2)
+                  #  print("Confidence: {}%_ {}".format(accuracy * 100, perturbed_prediction_name)) 
             
-                #succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
-                #success += succ
-                #accuracy += clean_acc
-
+                succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
+                success += succ
+                accuracy += clean_acc
+                "New"
+                preds.extend(pred)
+                labels_oneh.extend(label_oneh)
+                #print(success)
+            preds = np.array(preds).flatten()
+            labels_oneh = np.array(labels_oneh).flatten()
+            draw_reliability_graph(preds)
+            
+            accuracy = accuracy / len(val_loader)
+            print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+            success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
+            robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
+            print("robust accuracy for perturbations with")
+            for eps, acc in zip(epsilons, robust_accuracy, ):
+                print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   
+            plt.figure(figsize=(5,5))
+            plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
+            plt.show()
+            #%%
+        else: 
+            "Different step_size"
+            "defaults to 0.01 / 0.3"
+            #stepsize = [i/4 for i in eps] 
+            #epsilons = [args.epsilon]  # list
+            epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255]
+            #epsilons = []
+            accuracy = 0 
+            r_success = torch.zeros(len(epsilons),args.batch_size).cuda()
+            for batch_idx, (image, label) in enumerate(val_loader):
+                print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
+                success = torch.zeros(len(epsilons),args.batch_size).cuda()
+                for i, eps in enumerate(epsilons):
+                    stepsize = eps/args.stepsize # learning rate
+                    attack = LinfPGD(rel_stepsize=0.033, abs_stepsize=stepsize, steps=40, random_start=True) # Whether the perturbation is initialized randomly 
+                           # abs_stepsize: If given, it takes precedence over rel_stepsize, # rel_stepsize: Stepsize relative to epsilon
+                    images = image.cuda()
+                    labels = label.cuda() 
+                    #images, labels = ep.astensors(images, labels)
+                    #clean_acc = get_acc(fmodel, images, labels)
+                    "attack"
+                    raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=eps)    
+                    #print(succ)
+                    success[i] = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
+                    #print(success)
+                r_success += success
+                #print(r_success)
+            accuracy = accuracy / len(val_loader)
+            print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+            r_success = r_success/len(val_loader)            #  # succes of Attack (lowering accuracy)
+            robust_accuracy = 1 - r_success.mean(dim = -1)     # t.mean(dim=1): Mean of last dimension (different with other dim)
+            print("robust accuracy for perturbations with")
+            for eps, acc in zip(epsilons, robust_accuracy):
+                print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")  
+            plt.figure(figsize=(5,5))
+            plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
+            plt.show()  
+        
             
     elif args.attack_name == 'FGSM':
         attack = fa.FGSM()
