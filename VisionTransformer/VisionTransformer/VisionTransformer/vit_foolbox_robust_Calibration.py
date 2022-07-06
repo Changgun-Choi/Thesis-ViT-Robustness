@@ -2,7 +2,7 @@
 # git stash
 # git pull
 # conda activate thesis
-python vit_foolbox_robust_Calibration.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+#python vit_foolbox_robust_Calibration.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
