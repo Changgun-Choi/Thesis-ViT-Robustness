@@ -128,7 +128,7 @@ def draw_reliability_graph(preds, epsilon, model_name):
 
 #draw_reliability_graph(preds)
 
-'calibrated_network_{}_{}'.format(epsilon*255, args.model_name)
+#'calibrated_network_{}_{}'.format(epsilon*255, args.model_name)
 #%%
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Vision Transformer')
