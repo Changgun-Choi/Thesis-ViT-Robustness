@@ -42,11 +42,11 @@ from timm.models.registry import register_model
 from timm.models.layers import trunc_normal_
 from tqdm.notebook import tqdm
 #%%
-import json
-CLASSES = json.load(open('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/Adversarial_attack/imagenet_classes.json'))
-len(CLASSES)
-idx2class = [CLASSES[str(i)] for i in range(1000)]
-idx2class
+#import json
+#CLASSES = json.load(open('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/Adversarial_attack/imagenet_classes.json'))
+#len(CLASSES)
+#idx2class = [CLASSES[str(i)] for i in range(1000)]
+#idx2class
 
 def softmax_activation(inputs): 
     inputs = inputs.tolist()
