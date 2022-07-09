@@ -2,7 +2,7 @@
 # git stash
 # git pull
 # conda activate thesis
-#python vit_foolbox_robust_Calibration.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+#python vit_foolbox_robust_Calibration.py --model_name deit --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -91,38 +91,35 @@ def draw_reliability_graph(preds, epsilon, model_name):
   ECE, MCE = get_metrics(preds)
   bins, _, bin_accs, _, _ = calc_bins(preds)
 
-  fig = plt.figure(figsize=(8, 8))
+ # fig = plt.figure(figsize=(15, 12))
+  fig, ax = plt.subplots(2,3, figsize=(15, 12), facecolor='w', edgecolor='k')
+  plt.subplots_adjust(hspace=0.5)
   ax = fig.gca()
 
   # x/y limits
   ax.set_xlim(0, 1.05)
   ax.set_ylim(0, 1)
-
   # x/y labels
   plt.xlabel('Confidence')
   plt.ylabel('Accuracy')
-
   # Create grid
   ax.set_axisbelow(True) 
   ax.grid(color='gray', linestyle='dashed')
-
   # Error bars
   plt.bar(bins, bins,  width=0.1, alpha=0.3, edgecolor='black', color='r', hatch='\\')
-
   # Draw bars and identity line
   plt.bar(bins, bin_accs, width=0.1, alpha=1, edgecolor='black', color='b')
   plt.plot([0,1],[0,1], '--', color='gray', linewidth=2)
-
   # Equally spaced axes
   plt.gca().set_aspect('equal', adjustable='box')
-
   # ECE and MCE legend_{}_{}
   ECE_patch = mpatches.Patch(color='green', label='ECE = {:.2f}%_{}_{}'.format(ECE*100, epsilon*255, model_name))
   MCE_patch = mpatches.Patch(color='red', label='MCE = {:.2f}%_{}_{}'.format(MCE*100, epsilon*255, model_name))
   plt.legend(handles=[ECE_patch, MCE_patch])
-
+  
   plt.show()
   plt.savefig('calibrated_network_{}_{}.png'.format(epsilon*255, model_name), bbox_inches='tight')
+  
   print('ECE = {:.2f}%_{}_{}'.format(ECE*100, epsilon*255, model_name))
   print('MCE = {:.2f}%_{}_{}'.format(MCE*100, epsilon*255, model_name))
 
@@ -252,8 +249,9 @@ if __name__ == '__main__':
             "New"
             #preds = torch.empty(len(epsilons),args.batch_size, 1000).to(device) 
             #preds = torch.zeros(len(epsilons),args.batch_size).to(device) 
-           
-            for epsilon in epsilons:
+            
+            
+            for i, epsilon in enumerate(epsilons):
                 preds = []
                 labels_oneh = []
                 for batch_idx, (image, label) in enumerate(val_loader):
@@ -266,10 +264,11 @@ if __name__ == '__main__':
                     label_oneh = torch.nn.functional.one_hot(labels, num_classes=1000)
                     label_oneh = label_oneh.cpu().detach().numpy()
                     "Pred"
-                    output = fmodel(clipped_advs)
+                    pred = fmodel(clipped_advs)
                     sm = nn.Softmax(dim=1)
-                    pred = torch.unsqueeze(sm(output),0).cpu().detach().numpy()
-                    
+                    #pred = sm(pred)
+                    pred = torch.unsqueeze(sm(pred),0).cpu().detach().numpy()
+                    #pred = pred.cpu().detach().numpy()
                     preds.extend(pred)
                     labels_oneh.extend(label_oneh)
                 
@@ -277,7 +276,7 @@ if __name__ == '__main__':
                 preds = np.array(preds).flatten()
                 labels_oneh = np.array(labels_oneh).flatten()
                 draw_reliability_graph(preds, epsilon, args.model_name)
-  
+                
     
             
                 #succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
@@ -400,10 +399,53 @@ if __name__ == '__main__':
 
 #worst case (best attack per-sample)-
 #   [0.94 0.81 0.69 0.38 0.31 0.12 0.06 0.   0.   0.  ]      
+from matplotlib import pyplot as plt
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
+plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.00, 0.02, 0.06, 0.15, 0.20])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.1, 0.09, 0.04, 0.08, 0.13])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.11, 0.07, 0.06, 0.15, 0.19])
+
+plt.xlabel('Epsilons')
+plt.ylabel('ECE')
+plt.title('Expected Calibration Error')
+plt.legend(['ResNet', 'VGG', 'Efficient', 'ViT','ViT-Hybrid', 'DeiT', 'Swin'])
+plt.show()
+
+from matplotlib import pyplot as plt
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
+plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
 
 
+plt.xlabel('Epsilons')
+plt.ylabel('ECE')
+plt.title('Expected Calibration Error')
+plt.legend(['ResNet', 'VGG', 'Efficient', 'ViT'])
+plt.show()
 
+from matplotlib import pyplot as plt
+plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.00, 0.02, 0.06, 0.15, 0.20])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.1, 0.09, 0.04, 0.08, 0.13])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.11, 0.07, 0.06, 0.15, 0.19])
 
+plt.xlabel('Epsilons')
+plt.ylabel('ECE')
+plt.title('Expected Calibration Error')
+plt.legend(['ViT','ViT-Hybrid', 'DeiT', 'Swin'])
+plt.show()
+
+[[0.01, 0.04, 0.10, 0.14, 0.11]
+ [0.01, 0.02, 0.08, 0.18, 0.14]
+ [0.04, 0.03, 0.03, 0.10, 0.19]
+ [ 0  ,  0.01,0.05, 0.14, 0.20]
+ [0.00, 0.02, 0.06, 0.15, 0.20]
+ []
+]
 
 
 

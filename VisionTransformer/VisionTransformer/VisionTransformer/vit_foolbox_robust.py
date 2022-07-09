@@ -2,7 +2,8 @@
 # git stash
 # git pull
 # conda activate thesis
-# python vit_foolbox_robust.py --model_name resnet50 --attack_name FGSM --batch_size 16 --data_divide 10 --data_path server 
+# cd /home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
+# python vit_foolbox_robust.py --model_name vit_L --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -92,6 +93,10 @@ if __name__ == '__main__':
             
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
+             #  ImageNet-1k weights fine-tuned from in21k @ 224x224
+        elif args.model_name == 'vit_L':
+            model = timm.create_model('vit_large_patch16_224', pretrained=True).eval().to(device)  
+             
             
         elif args.model_name == 'vit_hybrid': #   
             "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py

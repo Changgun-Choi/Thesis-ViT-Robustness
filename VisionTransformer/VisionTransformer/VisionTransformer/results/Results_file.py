@@ -391,3 +391,87 @@ PGD: ex. confident on wrong prediction.
 : Compare results of ViT and CNNs
 
 #===============================================
+#%%
+Calibrated ECE
+1. "ViT has higher ECE"
+
+1) ResNet
+ECE = 0.01%_0_resnet50
+MCE = 33.28%_0_resnet50
+
+ECE = 0.04%_0.1_resnet50
+MCE = 41.19%_0.1_resnet50
+
+ECE = 0.10%_0.3_resnet50
+MCE = 56.64%_0.3_resnet50
+
+ECE = 0.14%_1.0_resnet50
+MCE = 93.03%_1.0_resnet50
+
+ECE = 0.11%_4.0_resnet50
+MCE = 98.32%_4.
+
+2) VGG
+ECE = 0.01%_0_VGG
+MCE = 9.30%_0_VGG    
+
+ECE = 0.02%_0.1_VGG
+MCE = 22.94%_0.1_VGG
+
+ECE = 0.08%_0.3_VGG
+MCE = 60.88%_0.3_VGG
+
+ECE = 0.18%_1.0_VGG
+MCE = 98.58%_1.0_VGG
+
+ECE = 0.14%_4.0_VGG
+MCE = 99.53%_4.0_VGG
+
+3) Efficient
+ECE = 0.04%_0_efficient
+MCE = 24.68%_0_efficient
+
+ECE = 0.03%_0.1_efficient
+MCE = 24.58%_0.1_efficient
+
+ECE = 0.03%_0.3_efficient
+MCE = 87.78%_0.3_efficient
+
+ECE = 0.10%_1.0_efficient
+MCE = 96.55%_1.0_efficient
+
+ECE = 0.19%_4.0_efficient
+MCE = 99.58%_4.0_efficient
+
+4)Vit
+ECE = 0.00%_0_vit
+MCE = 9.88%_0_vit
+
+ECE = 0.01%_0.1_vit
+MCE = 9.55%_0.1_vit
+
+ECE = 0.05%_0.3_vit
+MCE = 33.70%_0.3_vit
+
+ECE = 0.14%_1.0_vit
+MCE = 93.17%_1.0_vit
+
+ECE = 0.20%_4.0_vit
+MCE = 99.19%_4.0_vit
+
+5) ViT-Hybrid
+    
+ECE = 0.00%_0_vit_hybrid
+MCE = 10.99%_0_vit_hybrid
+
+ECE = 0.02%_0.1_vit_hybrid
+MCE = 25.32%_0.1_vit_hybrid
+
+ECE = 0.06%_0.3_vit_hybrid
+MCE = 39.88%_0.3_vit_hybrid
+
+ECE = 0.15%_1.0_vit_hybrid
+MCE = 94.07%_1.0_vit_hybrid
+
+ECE = 0.20%_4.0_vit_hybrid
+MCE = 99.29%_4.0_vit_hybrid
