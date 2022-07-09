@@ -3,7 +3,7 @@
 # git pull
 # conda activate thesis
 # cd /home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
-# python vit_foolbox_robust.py --model_name vit_L --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+# python vit_foolbox_robust.py --model_name vit_s --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -194,13 +194,13 @@ if __name__ == '__main__':
                     output = fmodel(advs_)
              
                     
-                    perturbed_prediction = output.max(1, keepdim=True)[1]
-                    perturbed_prediction_idx = perturbed_prediction.item()
-                    perturbed_prediction_name = idx2class[perturbed_prediction_idx]
+                    #perturbed_prediction = output.max(1, keepdim=True)[1]
+                    #perturbed_prediction_idx = perturbed_prediction.item()
+                    #perturbed_prediction_name = idx2class[perturbed_prediction_idx]
                     #print(output[:,263])
-                    accuracy = np.max(softmax_activation(output), axis=1)
-                    accuracy = round(accuracy[0], 2)
-                    print("Confidence: {}%_ {}".format(accuracy * 100, perturbed_prediction_name)) 
+                    #accuracy = np.max(softmax_activation(output), axis=1)
+                    #accuracy = round(accuracy[0], 2)
+                    #print("Confidence: {}%_ {}".format(accuracy * 100, perturbed_prediction_name)) 
                     
                 succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
                 success += succ
