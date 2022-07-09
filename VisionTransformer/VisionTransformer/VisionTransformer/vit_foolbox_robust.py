@@ -93,6 +93,9 @@ if __name__ == '__main__':
             
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
+        elif args.model_name == 'vit_s':
+             model = timm.create_model('vit_small_patch32_224', pretrained=True).eval().to(device)      
+            
              #  ImageNet-1k weights fine-tuned from in21k @ 224x224
         elif args.model_name == 'vit_L':
             model = timm.create_model('vit_large_patch16_224', pretrained=True).eval().to(device)  
