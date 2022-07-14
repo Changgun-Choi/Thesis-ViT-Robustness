@@ -405,46 +405,6 @@ if __name__ == '__main__':
 
 #worst case (best attack per-sample)-
 #   [0.94 0.81 0.69 0.38 0.31 0.12 0.06 0.   0.   0.  ]      
-from matplotlib import pyplot as plt
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
-plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.00, 0.02, 0.06, 0.15, 0.20])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.1, 0.09, 0.04, 0.08, 0.13])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.11, 0.07, 0.06, 0.15, 0.19])
-
-plt.xlabel('Epsilons')
-plt.ylabel('ECE')
-plt.title('Expected Calibration Error')
-plt.legend(['ResNet', 'VGG', 'Efficient', 'ViT','ViT-Hybrid', 'DeiT', 'Swin'])
-plt.show()
-
-from matplotlib import pyplot as plt
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
-plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
-
-
-plt.xlabel('Epsilons')
-plt.ylabel('ECE')
-plt.title('Expected Calibration Error')
-plt.legend(['ResNet', 'VGG', 'Efficient', 'ViT'])
-plt.show()
-
-from matplotlib import pyplot as plt
-plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.00, 0.02, 0.06, 0.15, 0.20])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.1, 0.09, 0.04, 0.08, 0.13])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.11, 0.07, 0.06, 0.15, 0.19])
-
-plt.xlabel('Epsilons')
-plt.ylabel('ECE')
-plt.title('Expected Calibration Error')
-plt.legend(['ViT','ViT-Hybrid', 'DeiT', 'Swin'])
-plt.show()
-
 
 
 

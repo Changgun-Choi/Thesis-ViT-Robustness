@@ -93,6 +93,14 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.001176470588235294: 52.5 %
   Linf norm ≤ 0.00392156862745098: 20.6 %
   Linf norm ≤ 0.01568627450980392:  0.1 %
+  
+  EfficientB4??
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 74.5 %
+  Linf norm ≤ 0.0003921568627450981: 61.3 %
+  Linf norm ≤ 0.001176470588235294: 37.9 %
+  Linf norm ≤ 0.00392156862745098:  6.0 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
 
 "PGD: ResNet_50" 
 clean accuracy:  84.2 %
@@ -475,3 +483,45 @@ MCE = 94.07%_1.0_vit_hybrid
 
 ECE = 0.20%_4.0_vit_hybrid
 MCE = 99.29%_4.0_vit_hybrid
+
+#%%
+from matplotlib import pyplot as plt
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
+plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.00, 0.02, 0.06, 0.15, 0.20])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.1, 0.09, 0.04, 0.08, 0.13])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.11, 0.07, 0.06, 0.15, 0.19])
+
+plt.xlabel('Epsilons')
+plt.ylabel('ECE')
+plt.title('Expected Calibration Error')
+plt.legend(['ResNet', 'VGG', 'Efficient', 'ViT','ViT-Hybrid', 'DeiT', 'Swin'])
+plt.show()
+
+from matplotlib import pyplot as plt
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
+plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
+
+
+plt.xlabel('Epsilons')
+plt.ylabel('ECE')
+plt.title('Expected Calibration Error')
+plt.legend(['ResNet', 'VGG', 'Efficient', 'ViT'])
+plt.show()
+
+from matplotlib import pyplot as plt
+plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.00, 0.02, 0.06, 0.15, 0.20])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.1, 0.09, 0.04, 0.08, 0.13])
+plt.plot([0, 0.1, 0.3, 1, 4],  [0.11, 0.07, 0.06, 0.15, 0.19])
+
+plt.xlabel('Epsilons')
+plt.ylabel('ECE')
+plt.title('Expected Calibration Error')
+plt.legend(['ViT','ViT-Hybrid', 'DeiT', 'Swin'])
+plt.show()
+
