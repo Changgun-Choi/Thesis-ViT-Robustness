@@ -188,10 +188,8 @@ if __name__ == "__main__":
                 plt.imshow(ex)
                 #plt.imshow(ex, cmap="gray")
 
-                ###################################  ex의 형태가 중요
+                ###################################  
             
-
-                
         plt.tight_layout()
         plt.show()
         

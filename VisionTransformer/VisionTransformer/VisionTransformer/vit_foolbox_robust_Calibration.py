@@ -2,7 +2,7 @@
 # git stash
 # git pull
 # conda activate thesis
-#python vit_foolbox_robust_Calibration.py --model_name deit --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+#python vit_foolbox_robust_Calibration.py --model_name efficient_b4 --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
@@ -157,6 +157,11 @@ if __name__ == '__main__':
         
         elif args.model_name == 'efficient':  #  80.4
             model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
+       
+        elif args.model_name == 'efficient_b4':
+            model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b4', pretrained=True).eval().to(device)
+
+            
             #model = timm.create_model('efficientnet_b0', pretrained=True)
             #from efficientnet_pytorch import EfficientNet
             #model = EfficientNet.from_pretrained('efficientnet-b0').eval().to(device)
@@ -191,7 +196,7 @@ if __name__ == '__main__':
         elif args.model_name == 'swin_path4':
             model = timm.create_model('swin_s3_base_224', pretrained=True).eval().to(device)
     
-            model = timm.create_model('swin_large_patch4_window7_224', pretrained=True)
+            model = timm.create_model('swin_large_patch4_window7_224', pretrained=True,num_classes=1000)
     
             
             model = timm.create_model('swin_large_patch4_window12_384_in22k', in_chans = 3, pretrained = True,)
@@ -201,8 +206,9 @@ if __name__ == '__main__':
             model = SwinModel.from_pretrained("microsoft/swin-tiny-patch4-window7-224")
             from timm.models import swin_base_patch4_window7_224_in22k
             timm.list_models(pretrained=True) 
-            timm.list_models('*resnet50*')
-       
+            timm.list_models('*efficientNet*')
+            model = timm.create_model('efficientnet_b6', pretrained=True,num_classes=1000)
+        
             
  #%%
     preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
@@ -439,13 +445,6 @@ plt.title('Expected Calibration Error')
 plt.legend(['ViT','ViT-Hybrid', 'DeiT', 'Swin'])
 plt.show()
 
-[[0.01, 0.04, 0.10, 0.14, 0.11]
- [0.01, 0.02, 0.08, 0.18, 0.14]
- [0.04, 0.03, 0.03, 0.10, 0.19]
- [ 0  ,  0.01,0.05, 0.14, 0.20]
- [0.00, 0.02, 0.06, 0.15, 0.20]
- []
-]
 
 
 
