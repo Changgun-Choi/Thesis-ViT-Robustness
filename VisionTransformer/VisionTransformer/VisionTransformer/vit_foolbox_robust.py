@@ -140,7 +140,7 @@ if __name__ == '__main__':
             model = SwinModel.from_pretrained("microsoft/swin-tiny-patch4-window7-224")
             from timm.models import swin_base_patch4_window7_224_in22k
             timm.list_models(pretrained=True) 
-            timm.list_models('*resnet50*')
+            timm.list_models('*resnet15*')
        
             #%%
  
@@ -163,7 +163,8 @@ if __name__ == '__main__':
         data_path = '/home/cchoi/Thesis_data/data/val'
         
     testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
-    sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.01 : 500
+    sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.1 : 5000
+    len(sample) # 5000
     valset = torch.utils.data.Subset(testset, sample) 
     val_loader = torch.utils.data.DataLoader(valset, args.batch_size ,drop_last=True)
     
@@ -183,11 +184,12 @@ if __name__ == '__main__':
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
             accuracy = 0 
             success = torch.zeros(len(epsilons),args.batch_size).to(device)
-
+            print(len(val_loader))
             for batch_idx, (image, label) in enumerate(val_loader):
                 print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
                 images = image.to(device)
                 labels = label.to(device)
+           
                 #images, labels = ep.astensors(images, labels)
                 clean_acc = get_acc(fmodel, images, labels)
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 

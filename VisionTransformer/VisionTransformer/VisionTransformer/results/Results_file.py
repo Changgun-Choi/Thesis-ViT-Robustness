@@ -504,13 +504,14 @@ from matplotlib import pyplot as plt
 plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
 plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
 plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
+plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.03, 0.08, 0.17, 0.18])  
 plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
 
 
 plt.xlabel('Epsilons')
 plt.ylabel('ECE')
 plt.title('Expected Calibration Error')
-plt.legend(['ResNet', 'VGG', 'Efficient', 'ViT'])
+plt.legend(['ResNet', 'VGG', 'Efficient', 'Efficient_B4', 'ViT'])
 plt.show()
 
 from matplotlib import pyplot as plt
