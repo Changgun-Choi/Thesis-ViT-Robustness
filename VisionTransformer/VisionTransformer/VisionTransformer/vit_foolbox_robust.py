@@ -90,7 +90,9 @@ if __name__ == '__main__':
             #model = timm.create_model('efficientnet_b0', pretrained=True)
             #from efficientnet_pytorch import EfficientNet
             #model = EfficientNet.from_pretrained('efficientnet-b0').eval().to(device)
-            
+        elif args.model_name == 'efficient_b4':
+            model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b4', pretrained=True).eval().to(device)
+   
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
         elif args.model_name == 'vit_s':
