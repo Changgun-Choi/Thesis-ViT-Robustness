@@ -85,6 +85,9 @@ if __name__ == '__main__':
         elif args.model_name == 'VGG':  # 80
             model = models.vgg19(pretrained=True).eval().to(device) 
         
+        elif args.model_name == 'mobile':
+            model = timm.create_model('mobilenetv2_140', pretrained=True)
+        
         elif args.model_name == 'efficient':  #  80.4
             model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
             #model = timm.create_model('efficientnet_b0', pretrained=True)
@@ -140,7 +143,8 @@ if __name__ == '__main__':
             model = SwinModel.from_pretrained("microsoft/swin-tiny-patch4-window7-224")
             from timm.models import swin_base_patch4_window7_224_in22k
             timm.list_models(pretrained=True) 
-            timm.list_models('*resnet15*')
+            timm.list_models('*mobilenetv2*')
+            
        
             #%%
  

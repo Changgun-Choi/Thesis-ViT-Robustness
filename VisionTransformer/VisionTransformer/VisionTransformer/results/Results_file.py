@@ -7,7 +7,7 @@ Created on Tue May 17 16:14:40 2022
 
 #%%
 # https://colab.research.google.com/drive/1muZ4QFgVfwALgqmrfOkp7trAvqDemckO?usp=sharing
-"Test data: 800 dataset"
+"Test data: 819 dataset"
 
 "FGSM : Resnet"
 #clean accuracy:  68.4 %
