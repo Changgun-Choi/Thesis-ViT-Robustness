@@ -156,7 +156,7 @@ if __name__ == '__main__':
         elif args.model_name == 'VGG':  # 80
             model = models.vgg19(pretrained=True).eval().to(device) 
         elif args.model_name == 'mobile':
-            model = timm.create_model('mobilenetv2_140', pretrained=True)
+            model = timm.create_model('mobilenetv2_140', pretrained=True).eval().to(device)
         
         elif args.model_name == 'efficient':  #  80.4
             model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True).eval().to(device)
