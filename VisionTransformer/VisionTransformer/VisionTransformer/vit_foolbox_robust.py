@@ -128,6 +128,8 @@ if __name__ == '__main__':
             model = deit_base_patch16_224(pretrained=True).eval().to(device)  
         elif args.model_name == 'deit_s':
             model = torch.hub.load('facebookresearch/deit:main','deit_small_patch16_224', pretrained=True).eval().to(device)
+        elif args.model_name == 'deit_t':
+            model = torch.hub.load('facebookresearch/deit:main','deit_tiny_patch16_224', pretrained=True).eval().to(device)
 
        
         elif args.model_name == 'swin':
