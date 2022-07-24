@@ -9,7 +9,7 @@ Created on Tue May 17 16:14:40 2022
 # https://colab.research.google.com/drive/1muZ4QFgVfwALgqmrfOkp7trAvqDemckO?usp=sharing
 "Test data: 819 dataset"
 
-"FGSM : Resnet"
+"FGSM : Resnet_18"
 #clean accuracy:  68.4 %
 #robust accuracy for perturbations with
  # Linf norm ≤ 0     : 68.4 %
@@ -61,7 +61,7 @@ robust accuracy for perturbations with
   #Linf norm ≤ 0.0003921568627450981: 76.6 %
   #Linf norm ≤ 0.001176470588235294: 74.0 %
   #Linf norm ≤ 0.00392156862745098: 67.4 %
-  #Linf norm ≤ 0.01568627450980392: 60.9 %
+  #Linf norm ≤ 0.01568627450980392:  60.9 %
   
 "FGSM: ViT + Resnet(CNN)"   model = timm.create_model('vit_base_r50_s16_224', pretrained=True).eval().to(device) 
 clean accuracy:  87.1 %
@@ -75,21 +75,31 @@ robust accuracy for perturbations with
 "PGD: ResNet"
  # Linf norm ≤ 0     : 68.4 %
   #Linf norm ≤ 0.0003921568627450981: 51.0 %
-  #Linf norm ≤ 0.001176470588235294: 24.1 %
+  #Linf norm ≤ 0.001176470588235294: 24.1 %   [68.4, 51, 24, 0.4, 0]
   #Linf norm ≤ 0.00392156862745098:  0.4 %
   #Linf norm ≤ 0.01568627450980392:  0.0 %
+  
+"MobileNet"
+clean accuracy:  78.1 %
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 78.1 %                     [68.4, 51, 24, 0.4, 0], [84.2, 68.8,42.59.2, 0], [78.1, 61.5,34.3, 5.8, 0 ]
+  Linf norm ≤ 0.0003921568627450981: 61.5 %
+  Linf norm ≤ 0.001176470588235294: 34.3 %
+  Linf norm ≤ 0.00392156862745098:  5.8 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %  
+  
 "PGD: VGG"
 clean accuracy:  73.0 %
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 73.0 %
-  Linf norm ≤ 0.0003921568627450981: 58.5 %
+  Linf norm ≤ 0.0003921568627450981: 58.5 %    
   Linf norm ≤ 0.001176470588235294: 30.0 %
   Linf norm ≤ 0.00392156862745098:  1.7 %
   Linf norm ≤ 0.01568627450980392:  0.1 %
     
 "PGD: EfficientNet"
   Linf norm ≤ 0     : 80.4 %
-  Linf norm ≤ 0.0003921568627450981: 71.6 %
+  Linf norm ≤ 0.0003921568627450981: 71.6 %   
   Linf norm ≤ 0.001176470588235294: 52.5 %
   Linf norm ≤ 0.00392156862745098: 20.6 %
   Linf norm ≤ 0.01568627450980392:  0.1 %
@@ -106,13 +116,13 @@ robust accuracy for perturbations with
 clean accuracy:  84.2 %
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 84.2 %
-  Linf norm ≤ 0.0003921568627450981: 68.8 %
-  Linf norm ≤ 0.001176470588235294: 42.5 %
+  Linf norm ≤ 0.0003921568627450981: 68.8 %     [68.4, 51, 24, 0.4, 0], [84.2, 68.8,42.59.2, 0]
+  Linf norm ≤ 0.001176470588235294: 42.5 %     
   Linf norm ≤ 0.00392156862745098:  9.2 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
 
-"PGD: Vit"  
-#robust accuracy for perturbations with
+"PGD: Vit"           [88.6,  78.1,  56.7,  12.5, 0]
+#robust accuracy for perturbations with  [
  # Linf norm ≤ 0     : 88.6 %
   #Linf norm ≤ 0.0003921568627450981: 78.1 %    ViT > EfficientNet
   #Linf norm ≤ 0.001176470588235294: 56.7 %     ViT > EfficientNet
@@ -120,11 +130,11 @@ robust accuracy for perturbations with
   #Linf norm ≤ 0.01568627450980392:  0.0 %      EfficientNet > ViT
 
 "PGD: DeiT" 다시다시다
-   Linf norm ≤ 0     : 79.8 %
-  #Linf norm ≤ 0.0003921568627450981: 64.9 %
-  #Linf norm ≤ 0.001176470588235294: 37.7 %
-  #Linf norm ≤ 0.00392156862745098:  6.7 %
-  #Linf norm ≤ 0.011764705882352941:  0.2 %
+ Linf norm ≤ 0     : 86.6 %
+  Linf norm ≤ 0.0003921568627450981: 71.6 %
+  Linf norm ≤ 0.001176470588235294: 45.1 %
+  Linf norm ≤ 0.00392156862745098:  8.3 %
+  Linf norm ≤ 0.01568627450980392:  0.1 %
   
 "PGD: Swin"  "Not robust to PGD attacks"          # 800
 #clean accuracy:  87.6 %
@@ -134,6 +144,12 @@ robust accuracy for perturbations with
  # Linf norm ≤ 0.001176470588235294: 23.5 %
   #Linf norm ≤ 0.00392156862745098:  1.1 %
   #Linf norm ≤ 0.01568627450980392:  0.0 %
+"PGD: ViT_Res"  "Not robust to PGD attacks"  
+  Linf norm ≤ 0     : 87.1 %
+  Linf norm ≤ 0.0003921568627450981: 72.2 %
+  Linf norm ≤ 0.001176470588235294: 39.1 %
+  Linf norm ≤ 0.00392156862745098:  2.8 %
+  Linf norm ≤ 0.01568627450980392:  0.0 %
 #%%
 "Fool_attack: resnet"
 #Linf norm ≤ 0     : 68.4 %
@@ -177,12 +193,10 @@ robust accuracy for perturbations with
 
 #%%
 "Test data: 800 test dataset, 5 Models tested "
-# Adversarial attack: maximizing the inner optimization problem
 "Accuracy" : Vit >  Swin > Hybrid > DeiT > Resnet50> efficient > VGG> ResNet
 FGSM:       Swin > DeiT > "Hybrid" > ViT > "ResNet_50" > EfficientNet > ResNet  
-
-"PGD:      EfficientNet > ViT > ResNet_50 > DeiT > Swin > ResNet"
-#"DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
+PGD:      EfficientNet > ViT > ResNet_50 > DeiT > Swin > ResNet"
+DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
 # minimal perturbation to fool
 # https://velog.io/@wilko97/%EB%85%BC%EB%AC%B8%EB%A6%AC%EB%B7%B0-DeepFool-a-simple-and-accurate-method-to-fool-deep-neural-networks-CVPR-2016
 
@@ -200,6 +214,7 @@ FGSM:       Swin > DeiT > "Hybrid" > ViT > "ResNet_50" > EfficientNet > ResNet
 #Future work: 
 #1. Look at frequency analysis of features -> How does learning low-level features affects robustness? 
 #   -> Literature or library? 
+
 "2. How model size affects Clean Accuracy and Robustness?  ex. CNNs influences compare them"
 #3. ViT + ResNet(CNNs) : Combining them
 #  How Convolution layer affects ViT robustness? 
@@ -218,7 +233,7 @@ FGSM:       Swin > DeiT > "Hybrid" > ViT > "ResNet_50" > EfficientNet > ResNet
 # Steps are hyperparameter to experiment but how do we fix (step_size and epsilon) in this case?  
 #Since the step size α is on the same scale as the total perturbation bound ϵ
 # it makes sense to choose α to be some reasonably small fraction of ϵ, 
-# and then choose the number of iterations to be a small multiple of ϵ/α => ex. 4, 8, 10 multiply
+# and then choose the number of iterations to be a small multiple of ϵ/α => ex. 4, 8, 12 multiply
 
 
 ###############################################################################
@@ -486,39 +501,88 @@ MCE = 99.29%_4.0_vit_hybrid
 
 #%%
 from matplotlib import pyplot as plt
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
-plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.00, 0.02, 0.06, 0.15, 0.20])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.1, 0.09, 0.04, 0.08, 0.13])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.11, 0.07, 0.06, 0.15, 0.19])
+plt.plot(xPoints, [0, 0.03, 0.08, 0.18])  # resnet 18
+plt.plot([0, 0.1, 0.3, 1], [0.01, 0.04, 0.10, 0.14])
+plt.plot([0, 0.1, 0.3, 1], [0.01, 0.02, 0.08, 0.18])
+plt.plot(xPoints, [0.02, 0.02, 0.04, 0.13])   # mobile
+plt.plot([0, 0.1, 0.3, 1], [0.04, 0.03, 0.03, 0.10])
+plt.plot([0, 0.1, 0.3, 1], [ 0  ,  0.01,0.05, 0.14])
+
+plt.plot([0, 0.1, 0.3, 1], [0.1, 0.09, 0.04, 0.08])
+plt.plot([0, 0.1, 0.3, 1],  [0.11, 0.07, 0.06, 0.15])
+plt.plot([0, 0.1, 0.3, 1], [0.00, 0.02, 0.06, 0.15])
 
 plt.xlabel('Epsilons')
 plt.ylabel('ECE')
 plt.title('Expected Calibration Error')
-plt.legend(['ResNet', 'VGG', 'Efficient', 'ViT','ViT-Hybrid', 'DeiT', 'Swin'])
+plt.legend(['resnet 18', 'ResNet50', 'VGG', ' mobile', 'Efficient', 'ViT', 'DeiT', 'Swin','ViT-Hybrid'])
 plt.show()
 
 from matplotlib import pyplot as plt
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.04, 0.10, 0.14, 0.11])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.02, 0.08, 0.18, 0.14])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.04, 0.03, 0.03, 0.10, 0.19])
-plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.03, 0.08, 0.17, 0.18])  
-plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
+#fig, (ax1, ax2) = plt.subplots(2,1)
+#fig.suptitle('Aligning x-axis using sharex')
 
 
+plt.plot(xPoints, [0, 0.03, 0.08, 0.18])
+plt.plot(xPoints, [0.01, 0.02, 0.08, 0.18])
+plt.plot(xPoints, [0.02, 0.02, 0.04, 0.13])
+plt.plot(xPoints, [0.04, 0.03, 0.03, 0.10])
+
+#ax1.subplot(1, 2, 1) # row 1, col 2 index 1
 plt.xlabel('Epsilons')
 plt.ylabel('ECE')
 plt.title('Expected Calibration Error')
-plt.legend(['ResNet', 'VGG', 'Efficient', 'Efficient_B4', 'ViT'])
+plt.legend(['ResNet18', 'VGG', 'mobilenet','Efficient'])
 plt.show()
 
+#ax2.subplot(1, 2, 2) # index 2
+xPoints = [0, 0.1, 0.3, 1]
+plt.plot(xPoints, [68.4, 51, 24, 0.4])
+plt.plot(xPoints, [73.0, 58.5, 30, 1.7])  
+plt.plot(xPoints, [78.1, 61.5,34.3, 5.8] )
+plt.plot(xPoints, [80.4, 71.6,52.5,20.6])
+
+
+plt.xlabel('Epsilons')
+plt.ylabel('Robustness')
+plt.title('Robust Accuracy')
+plt.legend(['ResNet18', 'VGG', 'mobilenet','Efficient'])
+plt.show()
+
+#%% Resnet18, VGG, Efficient, ViT
+xPoints = [0, 0.1, 0.3, 1]
+plt.plot(xPoints, [0, 0.03, 0.08, 0.18])
+plt.plot(xPoints, [0.01, 0.02, 0.08, 0.18])
+plt.plot(xPoints, [0.04, 0.03, 0.03, 0.10])
+plt.plot(xPoints, [ 0  ,  0.01,0.05, 0.14])
+#ax1.subplot(1, 2, 1) # row 1, col 2 index 1
+plt.xlabel('Epsilons')
+plt.ylabel('ECE')
+plt.title('Expected Calibration Error')
+plt.legend(['ResNet18', 'VGG','Efficient', 'ViT'])
+plt.show()
+
+plt.plot(xPoints, [68.4, 51, 24, 0.4])
+plt.plot(xPoints, [73.0, 58.5, 30, 1.7])  
+plt.plot(xPoints, [80.4, 71.6,52.5,20.6])
+plt.plot(xPoints, [88.6,  78.1,  56.7,  12.5])
+
+plt.xlabel('Epsilons')
+plt.ylabel('Robustness')
+plt.title('Robust Accuracy')
+plt.legend(['ResNet18', 'VGG','Efficient', 'ViT'])
+plt.show()
+
+
+
+
+# plt.plot(xPoints, [84.2, 68.8, 42.5, 9.2, 0]) ResNet50 Robustness
+xPoints = [0, 0.1, 0.3, 1]
 from matplotlib import pyplot as plt
-plt.plot([0, 0.1, 0.3, 1, 4], [ 0  ,  0.01,0.05, 0.14, 0.20])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.00, 0.02, 0.06, 0.15, 0.20])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.1, 0.09, 0.04, 0.08, 0.13])
-plt.plot([0, 0.1, 0.3, 1, 4],  [0.11, 0.07, 0.06, 0.15, 0.19])
+plt.plot(xPoints, [ 0  ,  0.01,0.05, 0.14])
+plt.plot(xPoints,  [0.00, 0.02, 0.06, 0.15])
+plt.plot(xPoints,  [0.1, 0.09, 0.04, 0.08])
+plt.plot(xPoints,  [0.11, 0.07, 0.06, 0.15])
 
 plt.xlabel('Epsilons')
 plt.ylabel('ECE')
@@ -526,3 +590,13 @@ plt.title('Expected Calibration Error')
 plt.legend(['ViT','ViT-Hybrid', 'DeiT', 'Swin'])
 plt.show()
 
+plt.plot(xPoints, [88.6,  78.1,  56.7,  12.5, 0])
+
+plt.xlabel('Epsilons')
+plt.ylabel('Robustness')
+plt.title('Robust Accuracy')
+plt.legend(['ViT','ViT-Hybrid', 'DeiT', 'Swin'])
+plt.show()
+
+#%%
+#plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.03, 0.08, 0.17, 0.18]): 'Efficient_B4',

@@ -112,7 +112,7 @@ if __name__ == '__main__':
             # vit_base_r50_s16_384  # vit_base_resnet50_384
             
         elif args.model_name == 'deit': 
-            #model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
+            model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
             def deit_base_patch16_224(pretrained=False, **kwargs):
                 model = VisionTransformer(
                     patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True,
@@ -126,6 +126,9 @@ if __name__ == '__main__':
                     model.load_state_dict(checkpoint["model"])
                 return model
             model = deit_base_patch16_224(pretrained=True).eval().to(device)  
+        elif args.model_name == 'deit_s':
+            model = torch.hub.load('facebookresearch/deit:main','deit_small_patch16_224', pretrained=True).eval().to(device)
+
        
         elif args.model_name == 'swin':
             model = timm.create_model('swin_base_patch4_window7_224', pretrained=True).eval().to(device)
