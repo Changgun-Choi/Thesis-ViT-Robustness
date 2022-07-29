@@ -11,10 +11,6 @@
 #python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
 #python vit_foolbox_robust.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
-
-#python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --filter y '--filter_f' low
-
-
 # nvidia-smi
 """ A simple example that demonstrates how to run a single attack against a PyTorch ResNet-18 model for different epsilons and how to then report
 the robust accuracy """
@@ -70,9 +66,6 @@ if __name__ == '__main__':
     parser.add_argument('--data_path',default = 'local', type = str) 
     parser.add_argument('--stepsize',default = '4', type = int) # /4, 8, 12
     parser.add_argument('--PGD_change',default = 'no', type = str) 
-    parser.add_argument('--filter_f',default =  'low', type = str)  # 0.3/255
-    parser.add_argument('--filter',default =  'y', type = str)  # 0.3/255
-
     #parser.add_argument('--epsilon',default =  0.001176, type = float)  # 0.3/255
     "Define args"
     args = parser.parse_args()  
@@ -105,7 +98,7 @@ if __name__ == '__main__':
         
         elif args.model_name == 'efficient_adv':
             from efficientnet_pytorch import EfficientNet
-            model = EfficientNet.from_pretrained("efficientnet-b0", advprop=True).eval().to(device)
+            model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b4', pretrained=True).eval().to(device)
         
         elif args.model_name == 'vit':
             model = timm.create_model('vit_base_patch16_224', pretrained=True).eval().to(device)  
@@ -183,7 +176,7 @@ if __name__ == '__main__':
         data_path = '/home/cchoi/Thesis_data/data/val'
         
     testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
-    sample = list(range(0, len(testset), args.data_divide)) #50 -> # 16 * 3125 * 0.5 : 1000
+    sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.1 : 5000
     print(len(testset))
     print(len(sample)) # 5000
     valset = torch.utils.data.Subset(testset, sample) 
@@ -204,7 +197,6 @@ if __name__ == '__main__':
         if args.PGD_change == 'no': 
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
             accuracy = 0 
-            robust_acc = 0
             success = torch.zeros(len(epsilons),args.batch_size).to(device)
             print(len(val_loader))
             for batch_idx, (image, label) in enumerate(val_loader):
@@ -215,54 +207,29 @@ if __name__ == '__main__':
                 #images, labels = ep.astensors(images, labels)
                 clean_acc = get_acc(fmodel, images, labels)
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 
-                if args.filter =='y':
-                    print('y')
-                    filter = 32
-                    import torch_dct as dct
-                    #if filter:
-                    robust_accuracy = torch.empty(len(epsilons))
-                    for eps_id in range(len(epsilons)):
-                        grad = torch.from_numpy(raw_advs[eps_id].cpu().numpy()).to(device) - images
-                        grad = grad.clone().detach_()
-                        freq = dct.dct_2d(grad)
-                        if args.filter_f== 'low':
-                            mask = torch.zeros(freq.size()).to(device)
-                            mask[:, :, :filter, :filter] = 1
-                        elif args.filter_f == 'high':
-                            mask = torch.zeros(freq.size()).to(device)
-                            mask[:, :, filter:, filter:] = 1
-                        masked_freq = torch.mul(freq, mask)
-                        new_grad = dct.idct_2d(masked_freq)
-                        x_adv = torch.clamp(images + new_grad, 0, 1).detach_()
-    
-                        robust_accuracy[eps_id] = (get_acc(fmodel, x_adv, labels))
-                        #success += robust_accuracy
-                        print(robust_accuracy)
-                    robust_acc += robust_accuracy
-                
-                else:
-                    for epsilon, advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
-                        #advs_ = advs_.requires_grad_(True)    
-                        output = fmodel(advs_)
-                        #perturbed_prediction = output.max(1, keepdim=True)[1]
-                        #perturbed_prediction_idx = perturbed_prediction.item()
-                        #perturbed_prediction_name = idx2class[perturbed_prediction_idx]
-                        #print(output[:,263])
-                        #accuracy = np.max(softmax_activation(output), axis=1)
-                        #accuracy = round(accuracy[0], 2)
-                        #print("Confidence: {}%_ {}".format(accuracy * 100, perturbed_prediction_name)) 
-                        
-                    succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
-                    success += succ
-                    #accuracy += clean_acc
+                for epsilon, advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
+                    #advs_ = advs_.requires_grad_(True)    
+                    output = fmodel(advs_)
+             
+                    
+                    #perturbed_prediction = output.max(1, keepdim=True)[1]
+                    #perturbed_prediction_idx = perturbed_prediction.item()
+                    #perturbed_prediction_name = idx2class[perturbed_prediction_idx]
+                    #print(output[:,263])
+                    #accuracy = np.max(softmax_activation(output), axis=1)
+                    #accuracy = round(accuracy[0], 2)
+                    #print("Confidence: {}%_ {}".format(accuracy * 100, perturbed_prediction_name)) 
+                    
+                succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
+                success += succ
+                accuracy += clean_acc
                 #print(success)
-            #accuracy = accuracy / len(val_loader)
-            #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
-            #success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
-            #robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
-            robust_acc = robust_acc /len(val_loader) 
+            accuracy = accuracy / len(val_loader)
+            print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+            success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
+            robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
             print("robust accuracy for perturbations with")
-            for eps, acc in zip(epsilons, robust_acc):
+            for eps, acc in zip(epsilons, robust_accuracy):
                 print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   
             plt.figure(figsize=(5,5))
             plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
