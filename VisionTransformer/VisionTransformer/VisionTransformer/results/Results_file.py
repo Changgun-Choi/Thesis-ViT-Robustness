@@ -602,7 +602,7 @@ plt.show()
 #plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.03, 0.08, 0.17, 0.18]): 'Efficient_B4',
 
 #%%
-ViT
+ViT : Less sensitive to high frequency perturbations
 
 "High"
   Linf norm ≤ 0     : 88.6 %
@@ -643,6 +643,12 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.00392156862745098: 80.8 %
   Linf norm ≤ 0.01568627450980392: 78.7 %
   
+"high"
+ Linf norm ≤ 0     : 87.1 %
+  Linf norm ≤ 0.0003921568627450981: 81.5 %
+  Linf norm ≤ 0.001176470588235294: 72.8 %
+  Linf norm ≤ 0.00392156862745098: 50.2 %
+  Linf norm ≤ 0.01568627450980392: 29.7 %  
   
 
 

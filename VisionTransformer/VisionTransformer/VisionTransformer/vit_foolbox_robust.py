@@ -71,7 +71,7 @@ if __name__ == '__main__':
     parser.add_argument('--stepsize',default = '4', type = int) # /4, 8, 12
     parser.add_argument('--PGD_change',default = 'no', type = str) 
     parser.add_argument('--filter_f',default =  'low', type = str)  # 0.3/255
-    parser.add_argument('--filter',default =  'y', type = str)  # 0.3/255
+    parser.add_argument('--filter',default =  'n, type = str)  # 0.3/255
 
     #parser.add_argument('--epsilon',default =  0.001176, type = float)  # 0.3/255
     "Define args"
@@ -262,8 +262,8 @@ if __name__ == '__main__':
                 #print(success)
             #accuracy = accuracy / len(val_loader)
             #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
-            #success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
-            #robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
+            success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
+            robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
             robust_acc = robust_acc /len(val_loader) 
             print("robust accuracy for perturbations with")
             for eps, acc in zip(epsilons, robust_acc):
