@@ -12,7 +12,7 @@
 #python vit_foolbox_robust.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 
-#python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --filter y '--filter_f' low
+#python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --filter y '--filter_f' low --data_path server 
 
 
 # nvidia-smi
@@ -217,7 +217,7 @@ if __name__ == '__main__':
                 "Full Pass result"
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 
                 if args.filter =='y':
-                    print('y')
+                    #print('y')
                     filter = 32
                     import torch_dct as dct
                     #if filter:
@@ -238,7 +238,7 @@ if __name__ == '__main__':
     
                         robust_accuracy[eps_id] = (get_acc(fmodel, x_adv, labels))
                         #success += robust_accuracy
-                        print(robust_accuracy)
+                        #print(robust_accuracy)
                     robust_acc += robust_accuracy
                 
                 else:
