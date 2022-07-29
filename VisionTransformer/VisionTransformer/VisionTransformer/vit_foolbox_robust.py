@@ -71,7 +71,7 @@ if __name__ == '__main__':
     parser.add_argument('--stepsize',default = '4', type = int) # /4, 8, 12
     parser.add_argument('--PGD_change',default = 'no', type = str) 
     parser.add_argument('--filter_f',default =  'low', type = str)  # 0.3/255
-    parser.add_argument('--filter',default =  'n, type = str)  # 0.3/255
+    parser.add_argument('--filter',default =  'n', type = str)  # 0.3/255
 
     #parser.add_argument('--epsilon',default =  0.001176, type = float)  # 0.3/255
     "Define args"
