@@ -214,6 +214,7 @@ if __name__ == '__main__':
            
                 #images, labels = ep.astensors(images, labels)
                 clean_acc = get_acc(fmodel, images, labels)
+                "Full Pass result"
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 
                 if args.filter =='y':
                     print('y')
@@ -227,7 +228,7 @@ if __name__ == '__main__':
                         freq = dct.dct_2d(grad)
                         if args.filter_f== 'low':
                             mask = torch.zeros(freq.size()).to(device)
-                            mask[:, :, :filter, :filter] = 1
+                            mask[:, :, :filter, :filter] = 1           # until filter 32
                         elif args.filter_f == 'high':
                             mask = torch.zeros(freq.size()).to(device)
                             mask[:, :, filter:, filter:] = 1
