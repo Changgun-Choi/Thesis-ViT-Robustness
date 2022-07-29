@@ -119,7 +119,7 @@ if __name__ == '__main__':
             
         elif args.model_name == 'vit_hybrid': #   
             "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py
-            model = timm.create_model('vit_large_r50_s32_224', pretrained=True,num_classes=1000).eval().to(device)
+            model = timm.create_model('vit_large_r50_s32_224', pretrained=True).eval().to(device)
             # vit_base_r50_s16_384  # vit_base_resnet50_384
             
         elif args.model_name == 'deit': 
@@ -178,9 +178,12 @@ if __name__ == '__main__':
     #epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255, 4/255]  # 0.5/255, 0.8/255
     
     if args.data_path == 'local':
-        data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
+        data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/'
     elif args.data_path == 'server':
         data_path = '/home/cchoi/Thesis_data/data/val'
+    elif args.data_path == 'full_server':
+        data_path = '/home/cchoi/Thesis_data/val/val'
+            
         
     testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide)) #50 -> # 16 * 3125 * 0.5 : 1000

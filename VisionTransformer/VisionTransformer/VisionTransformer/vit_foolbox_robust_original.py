@@ -8,8 +8,8 @@
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #python vit_foolbox_robust.py --model_name efficient --attack_name FGSM --batch_size 16 --data_divide 1000 
-#python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
-#python vit_foolbox_robust.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+#python vit_foolbox_robust_original.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 100 --data_path server
+#python vit_foolbox_robust_original.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 100 --data_path server 
 
 # nvidia-smi
 """ A simple example that demonstrates how to run a single attack against a PyTorch ResNet-18 model for different epsilons and how to then report
@@ -174,6 +174,8 @@ if __name__ == '__main__':
         data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
     elif args.data_path == 'server':
         data_path = '/home/cchoi/Thesis_data/data/val'
+    elif args.data_path == 'full_server':
+        data_path = '/home/cchoi/Thesis_data/val/val'
         
     testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.1 : 5000

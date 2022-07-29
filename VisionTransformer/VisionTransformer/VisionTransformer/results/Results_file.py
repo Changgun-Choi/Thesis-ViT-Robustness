@@ -600,3 +600,49 @@ plt.show()
 
 #%%
 #plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.03, 0.08, 0.17, 0.18]): 'Efficient_B4',
+
+#%%
+ViT
+
+"High"
+  Linf norm ≤ 0     : 88.6 %
+  Linf norm ≤ 0.0003921568627450981: 83.6 %
+  Linf norm ≤ 0.001176470588235294: 74.9 %
+  Linf norm ≤ 0.00392156862745098: 50.5 %
+  Linf norm ≤ 0.01568627450980392: 27.3 %
+
+"Low"
+ Linf norm ≤ 0     : 88.6 %
+  Linf norm ≤ 0.0003921568627450981: 87.6 %
+  Linf norm ≤ 0.001176470588235294: 85.4 %
+  Linf norm ≤ 0.00392156862745098: 79.8 %
+  Linf norm ≤ 0.01568627450980392: 72.8 %
+
+Efficient : Weak at high 
+"High"
+  Linf norm ≤ 0     : 80.4 %
+  Linf norm ≤ 0.0003921568627450981: 75.6 %
+  Linf norm ≤ 0.001176470588235294: 65.2 %
+  Linf norm ≤ 0.00392156862745098: 34.9 %
+  Linf norm ≤ 0.01568627450980392:  4.5 %
+  
+"Low"
+
+  Linf norm ≤ 0     : 80.4 %
+  Linf norm ≤ 0.0003921568627450981: 79.4 %
+  Linf norm ≤ 0.001176470588235294: 78.4 %
+  Linf norm ≤ 0.00392156862745098: 75.6 %
+  Linf norm ≤ 0.01568627450980392: 72.9 %
+  
+ViT_hybrid 
+"low"
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 87.1 %
+  Linf norm ≤ 0.0003921568627450981: 85.4 %
+  Linf norm ≤ 0.001176470588235294: 83.8 %
+  Linf norm ≤ 0.00392156862745098: 80.8 %
+  Linf norm ≤ 0.01568627450980392: 78.7 %
+  
+  
+
+
