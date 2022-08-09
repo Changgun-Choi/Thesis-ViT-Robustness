@@ -1,12 +1,13 @@
 "Main py"
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
-#python vit.py --pretrained 1 --mode test
+#python vit1.py --mode test
+# --pretrained 1
 import os
 os.chdir('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer')
 
 # Module Created (py)
 import patchdata
-import model
+import models
 import test
 import attacks  ## 
 ########################
@@ -16,6 +17,11 @@ import torch.nn as nn
 import matplotlib.pyplot as plt
 import numpy as np
 from torchvision import transforms
+from foolbox import PyTorchModel, accuracy, samples
+from foolbox.attacks import LinfPGD
+import foolbox.attacks as attack
+import foolbox.attacks as fa
+import foolbox as fb
 
 import argparse ##############  Use in Terminal
 import time
@@ -63,44 +69,12 @@ if __name__ == "__main__":
         model = model.VisionTransformer(patch_vec_size=image_patches.size(2), num_patches=image_patches.size(1),   # image_patches.size 
                                   latent_vec_dim=latent_vec_dim, num_heads=args.num_heads, mlp_hidden_dim=mlp_hidden_dim,
                                   drop_rate=args.drop_rate, num_layers=args.num_layers, num_classes=args.num_classes).to(device)
-        
+        model.load_state_dict(torch.load('./model.pth'))      
     
     # vit(image_patches.to(device))
      # Test 40 * 128
 #%% 
     "Train"
-    if args.pretrained == 1:
-      if args.model == 'vit':
-          model.load_state_dict(torch.load('./model.pth'))   # 바뀔수 있음
-        
-      if args.model == 'vit_B_16_imagenet1k':  
-        
-        from pytorch_pretrained_vit import ViT
-        model = ViT('B_16_imagenet1k', pretrained=True)
-        model = model.eval().to(device)
-                  
-          
-      elif args.model_name == 'deit':
-          model = torch.hub.load('facebookresearch/deit:main','deit_tiny_patch16_224', pretrained=True)
-          model = model.eval().to(device)
-          
-      elif args.model_name =='deit_distilled':
-          model = torch.hub.load('facebookresearch/deit:main','deit_base_distilled_patch16_224', pretrained=True)
-          model = model.eval().to(device)
-          
-      elif args.model_name == 'efficientnet':
-      
-          model = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_efficientnet_b0', pretrained=True)
-          #utils = torch.hub.load('NVIDIA/DeepLearningExamples:torchhub', 'nvidia_convnets_processing_utils')
-          model.eval().to(device)
-          model = model.eval().to(device)
-      elif args.model_name == 'dino_vit':
-          model = torch.hub.load('facebookresearch/dino:main', 'dino_vitb16')
-          model = model.eval().to(device)
-          
-      elif args.model_name == 'dino_xcit':   
-          model = torch.hub.load('facebookresearch/dino:main', 'dino_xcit_medium_24_p16')
-          model = model.eval().to(device)
         
     if args.mode == 'train':   # hyper-parameter
         # Loss and optimizer
@@ -141,12 +115,50 @@ if __name__ == "__main__":
                 torch.save(model.state_dict(), './model.pth')  # 계속 update 되는 것 
 
 #%% Test(Accuracy, Adversairal Attack)"
-    else:
-        #vit.load_state_dict(torch.load('./model.pth'))   
+    elif args.mode == 'test':
+        vit.load_state_dict(torch.load('./model.pth'))   
         
-        test_acc, test_loss = test.accuracy(testloader, model)  # vit: Trained model
+        preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
+        fmodel = PyTorchModel(vit, bounds=(0, 1), preprocessing=preprocessing)
+        
+        test_transform = transforms.Compose([
+            transforms.Resize((32, 32)),     # Cifar 10 (32 x 32)  / ImageNet 220 x220 
+            transforms.ToTensor(),
+            #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])    
+        
+        epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]
+        
+        test_acc, test_loss = test.accuracy(testloader, vit)  # vit: Trained model
         print('test loss: %.3f, test acc %.2f %%' % (test_loss, test_acc))
         
+        accuracy = 0 
+        success = torch.zeros(len(epsilons),args.batch_size).cuda()
+        for batch_idx, (image, label) in enumerate(testloader):
+            print("Attack: {}/{}".format(batch_idx+1, len(testloader)-1))
+            images = image.cuda()
+            labels = label.cuda()
+            #images, labels = ep.astensors(images, labels)
+            clean_acc = get_acc(fmodel, images, labels)
+            raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)         
+            succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
+            #print(succ)
+            success += succ
+            accuracy += clean_acc
+            #print(success)
+        accuracy = accuracy / len(val_loader)
+        print(f"clean accuracy:  {accuracy * 100:.1f} %") 
+        success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
+        robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
+        print("robust accuracy for perturbations with")
+        for eps, acc in zip(epsilons, robust_accuracy):
+            print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   
+        plt.figure(figsize=(5,5))
+        plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
+        plt.show()
+        
+        #%%
+    else:    
         ## Test Attactks  
         "attackloader:공격을 하나씩 해야해서 batch_size = 1"
         # Sampled data
@@ -212,17 +224,3 @@ if __name__ == "__main__":
 #Epsilon: 0.2    Test Accuracy = 81 / 500 = 0.162
 #Epsilon: 0.25   Test Accuracy = 59 / 500 = 0.118
 #Epsilon: 0.3    Test Accuracy = 61 / 500 = 0.122
-"vit_explain.py"
-                #transform = transforms.Compose([
-                #    transforms.Resize((224, 224)),
-                #    transforms.ToTensor(),
-                #    transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
-                #])
-                
-               # img = ex.resize((224, 224))
-               # input_tensor = transform(ex).unsqueeze(0)
-                #args.category_index is None:          # "If category_index isn't specified, Attention Rollout will be used"
-#                    print("Doing Attention Rollout")
-               # attention_rollout = VITAttentionRollout(model, head_fusion=args.head_fusion, discard_ratio=args.discard_ratio)
-               # mask = attention_rollout(input_tensor)
-               # name = "attention_rollout_{:.3f}_{}.png".format(args.discard_ratio, args.head_fusion) 

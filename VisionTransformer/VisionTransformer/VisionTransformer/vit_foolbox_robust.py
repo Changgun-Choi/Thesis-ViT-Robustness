@@ -161,7 +161,55 @@ if __name__ == '__main__':
             timm.list_models(pretrained=True) 
             timm.list_models('*mobilenetv2*')
             
-       
+            
+            import tensorflow as tf
+            from tensorflow import keras
+            new_model = tf.keras.models.load_model('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/Trained/EnetB0_CIFAR10_TL.h5')
+            ############
+            
+            import tensorflow.keras as keras
+            import efficientnet.tfkeras as efn
+            from keras.layers import Dense, Dropout, Activation, BatchNormalization, Flatten
+            from keras.backend import sigmoid
+            from keras.models import Model
+
+            class SwishActivation(Activation):
+                
+                def __init__(self, activation, **kwargs):
+                    super(SwishActivation, self).__init__(activation, **kwargs)
+                    self.__name__ = 'swish_act'
+            
+            def swish_act(x, beta = 1):
+                return (x * sigmoid(beta * x))
+            
+            from keras.utils.generic_utils import get_custom_objects
+            from keras.layers import Activation
+            get_custom_objects().update({'swish_act': SwishActivation(swish_act)})
+            #sm.set_framework('tf.keras')
+            model = efn.EfficientNetB0(include_top=False, input_shape=(32,32,3), pooling='avg', weights='imagenet')
+
+            # building 2 fully connected layer 
+            x = model.output
+            
+            x = BatchNormalization()(x)
+            x = Dropout(0.7)(x)
+            
+            x = Dense(512)(x)
+            x = BatchNormalization()(x)
+            x = Activation(swish_act)(x)
+            x = Dropout(0.5)(x)
+            
+            x = Dense(128)(x)
+            x = BatchNormalization()(x)
+            x = Activation(swish_act)(x)
+            
+            # output layer
+            predictions = Dense(10, activation="softmax")(x)
+            
+            model_final = Model(inputs = model.input, outputs = predictions)
+            
+            model_final.summary()
+            
             #%%
  
     preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
@@ -178,7 +226,7 @@ if __name__ == '__main__':
     #epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255, 4/255]  # 0.5/255, 0.8/255
     
     if args.data_path == 'local':
-        data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/'
+        data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
     elif args.data_path == 'server':
         data_path = '/home/cchoi/Thesis_data/data/val'
     elif args.data_path == 'full_server':
@@ -242,29 +290,18 @@ if __name__ == '__main__':
                         robust_accuracy[eps_id] = (get_acc(fmodel, x_adv, labels))
                         #success += robust_accuracy
                         #print(robust_accuracy)
-                    robust_acc += robust_accuracy
+                    #robust_acc += robust_accuracy
+                    #robust_acc = robust_acc /len(val_loader)
                 
                 else:
-                    for epsilon, advs_ in zip(epsilons, clipped_advs): # "clipped_advs" we would need to check if the perturbation sizes are actually within the specified epsilon bound
-                        #advs_ = advs_.requires_grad_(True)    
-                        output = fmodel(advs_)
-                        #perturbed_prediction = output.max(1, keepdim=True)[1]
-                        #perturbed_prediction_idx = perturbed_prediction.item()
-                        #perturbed_prediction_name = idx2class[perturbed_prediction_idx]
-                        #print(output[:,263])
-                        #accuracy = np.max(softmax_activation(output), axis=1)
-                        #accuracy = round(accuracy[0], 2)
-                        #print("Confidence: {}%_ {}".format(accuracy * 100, perturbed_prediction_name)) 
-                        
-                    succ = torch.cuda.FloatTensor(succ.detach().cpu().numpy()) # 1) EagerPy -> numpy 2) Numpy -> FloatTensor)
-                    success += succ
-                    #accuracy += clean_acc
-                #print(success)
-            #accuracy = accuracy / len(val_loader)
-            #print(f"clean accuracy:  {accuracy * 100:.1f} %") 
-            success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
-            robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
-            robust_acc = robust_acc /len(val_loader) 
+                    robust_accuracy = 1 - success.mean(dim=-1)
+                    #obust_acc = robust_accuracy / args.attack_epochs
+                    
+                robust_acc = robust_accuracy /len(val_loader) 
+                
+           #success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
+           #robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
+            #robust_acc = robust_acc /len(val_loader) 
             print("robust accuracy for perturbations with")
             for eps, acc in zip(epsilons, robust_acc):
                 print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   

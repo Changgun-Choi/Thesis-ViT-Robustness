@@ -237,7 +237,32 @@ DeepFool: ViT > Efficient > DeiT > ResNet > Swin"
 
 
 ###############################################################################
-"PGD: EfficientNet"
+    
+  
+"PGD: ResNet50"
+
+ Linf norm ≤ 0     : 84.2 %
+ Linf norm ≤ 0.0003921568627450981: 65.1 %
+ Linf norm ≤ 0.001176470588235294: 28.9 %
+ Linf norm ≤ 0.00196078431372549: 12.5 %
+ Linf norm ≤ 0.0031372549019607846:  4.0 %
+ Linf norm ≤ 0.00392156862745098:  2.6 %
+                                      0
+  Linf norm ≤ 0     : 84.2 %
+Linf norm ≤ 0.0003921568627450981: 65.1 %
+Linf norm ≤ 0.001176470588235294: 30.4 %
+Linf norm ≤ 0.00196078431372549: 14.0 %
+Linf norm ≤ 0.0031372549019607846:  4.9 %
+Linf norm ≤ 0.00392156862745098:  2.9 %
+
+Linf norm ≤ 0     : 84.2 %
+Linf norm ≤ 0.0003921568627450981: 65.1 %
+Linf norm ≤ 0.001176470588235294: 31.9 %
+Linf norm ≤ 0.00196078431372549: 15.6 %
+Linf norm ≤ 0.0031372549019607846:  5.9 %
+Linf norm ≤ 0.00392156862745098:  3.4 %
+
+"PGD: EfficientNet"\
 
 1. step_size = eps/4
 robust accuracy for perturbations with
@@ -297,29 +322,7 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.00392156862745098:  4.7 %
   Linf norm ≤ 0.01568627450980392:  0.0 %
   ######################################################
-  
-"PGD: ResNet50"
 
-  Linf norm ≤ 0     : 84.2 %
-  Linf norm ≤ 0.0003921568627450981: 65.1 %
-  Linf norm ≤ 0.001176470588235294: 28.9 %
-  Linf norm ≤ 0.00196078431372549: 12.5 %
-  Linf norm ≤ 0.0031372549019607846:  4.0 %
-  Linf norm ≤ 0.00392156862745098:  2.6 %
-                                      0
-  Linf norm ≤ 0     : 84.2 %
-Linf norm ≤ 0.0003921568627450981: 65.1 %
-Linf norm ≤ 0.001176470588235294: 30.4 %
-Linf norm ≤ 0.00196078431372549: 14.0 %
-Linf norm ≤ 0.0031372549019607846:  4.9 %
-Linf norm ≤ 0.00392156862745098:  2.9 %
-
-Linf norm ≤ 0     : 84.2 %
-Linf norm ≤ 0.0003921568627450981: 65.1 %
-Linf norm ≤ 0.001176470588235294: 31.9 %
-Linf norm ≤ 0.00196078431372549: 15.6 %
-Linf norm ≤ 0.0031372549019607846:  5.9 %
-Linf norm ≤ 0.00392156862745098:  3.4 %
 ##################################################
 "PGD: ViT_Hybrid"
 1. step_size = eps/4
@@ -602,6 +605,28 @@ plt.show()
 #plt.plot([0, 0.1, 0.3, 1, 4], [0.01, 0.03, 0.08, 0.17, 0.18]): 'Efficient_B4',
 
 #%%
+"ViT-low 1000"
+Linf norm ≤ 0     : 83.3 %                     
+Linf norm ≤ 0.0003921568627450981: 82.3 %
+Linf norm ≤ 0.001176470588235294: 80.4 %
+Linf norm ≤ 0.00392156862745098: 73.6 %
+Linf norm ≤ 0.01568627450980392: 65.0 %
+  
+"high-efficient-1000"
+ Linf norm ≤ 0     : 72.1 %
+  Linf norm ≤ 0.0003921568627450981: 67.2 %
+  Linf norm ≤ 0.001176470588235294: 57.1 %
+  Linf norm ≤ 0.00392156862745098: 27.3 %
+  Linf norm ≤ 0.01568627450980392:  3.6 %
+  
+"low-efficient-1000"
+robust accuracy for perturbations with  1000
+  Linf norm ≤ 0     : 72.1 %
+  Linf norm ≤ 0.0003921568627450981: 70.9 %
+  Linf norm ≤ 0.001176470588235294: 69.5 %
+  Linf norm ≤ 0.00392156862745098: 66.7 %
+  Linf norm ≤ 0.01568627450980392: 64.1 %
+
 ViT : Less sensitive to high frequency perturbations
 
 "High"
@@ -617,8 +642,23 @@ ViT : Less sensitive to high frequency perturbations
   Linf norm ≤ 0.001176470588235294: 85.4 %
   Linf norm ≤ 0.00392156862745098: 79.8 %
   Linf norm ≤ 0.01568627450980392: 72.8 %
+ 
+DeiT
+"high"
+  Linf norm ≤ 0     : 86.6 %
+  Linf norm ≤ 0.0003921568627450981: 82.5 %
+  Linf norm ≤ 0.001176470588235294: 75.1 %
+  Linf norm ≤ 0.00392156862745098: 63.6 %
+  Linf norm ≤ 0.01568627450980392: 46.9 %
+  
+"low"
+  Linf norm ≤ 0     : 86.6 %
+  Linf norm ≤ 0.0003921568627450981: 84.2 %
+  Linf norm ≤ 0.001176470588235294: 81.0 %
+  Linf norm ≤ 0.00392156862745098: 72.9 %
+  Linf norm ≤ 0.01568627450980392: 62.5 %
 
-Efficient : Weak at high 
+Efficient : Weak at high, Strong at high
 "High"
   Linf norm ≤ 0     : 80.4 %
   Linf norm ≤ 0.0003921568627450981: 75.6 %
@@ -627,14 +667,19 @@ Efficient : Weak at high
   Linf norm ≤ 0.01568627450980392:  4.5 %
   
 "Low"
-
   Linf norm ≤ 0     : 80.4 %
   Linf norm ≤ 0.0003921568627450981: 79.4 %
   Linf norm ≤ 0.001176470588235294: 78.4 %
   Linf norm ≤ 0.00392156862745098: 75.6 %
   Linf norm ≤ 0.01568627450980392: 72.9 %
   
-ViT_hybrid 
+ViT_hybrid : Strong at low, weak at high
+"high"
+ Linf norm ≤ 0     : 87.1 %
+  Linf norm ≤ 0.0003921568627450981: 81.5 %
+  Linf norm ≤ 0.001176470588235294: 72.8 %
+  Linf norm ≤ 0.00392156862745098: 50.2 %
+  Linf norm ≤ 0.01568627450980392: 29.7 %  
 "low"
 robust accuracy for perturbations with
   Linf norm ≤ 0     : 87.1 %
@@ -643,12 +688,26 @@ robust accuracy for perturbations with
   Linf norm ≤ 0.00392156862745098: 80.8 %
   Linf norm ≤ 0.01568627450980392: 78.7 %
   
+resnet_50
 "high"
- Linf norm ≤ 0     : 87.1 %
-  Linf norm ≤ 0.0003921568627450981: 81.5 %
-  Linf norm ≤ 0.001176470588235294: 72.8 %
-  Linf norm ≤ 0.00392156862745098: 50.2 %
-  Linf norm ≤ 0.01568627450980392: 29.7 %  
-  
+  Linf norm ≤ 0     : 84.2 %
+  Linf norm ≤ 0.0003921568627450981: 74.5 %
+  Linf norm ≤ 0.001176470588235294: 56.6 % 
+  Linf norm ≤ 0.00392156862745098: 21.2 %
+  Linf norm ≤ 0.01568627450980392:  3.6 %
+"low"
+  Linf norm ≤ 0     : 84.2 %
+  Linf norm ≤ 0.0003921568627450981: 82.7 %
+  Linf norm ≤ 0.001176470588235294: 82.1 %
+  Linf norm ≤ 0.00392156862745098: 80.5 %
+  Linf norm ≤ 0.01568627450980392: 79.8 %
+#%%
 
+SWin 1000 low
+robust accuracy for perturbations with
+  Linf norm ≤ 0     : 82.4 %
+  Linf norm ≤ 0.0003921568627450981: 81.5 %
+  Linf norm ≤ 0.001176470588235294: 81.1 %
+  Linf norm ≤ 0.00392156862745098: 80.5 %
+  Linf norm ≤ 0.01568627450980392: 79.9 %
 
