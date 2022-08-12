@@ -3,7 +3,7 @@
 # git pull
 # conda activate thesis
 # cd /home/cchoi/data/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
-# python vit_foolbox_robust.py --model_name vit_s --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+# python vit_foolbox_robust.py --model_name vit_s --attack_name PGD --batch_size 16 --data_divide 1000 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
