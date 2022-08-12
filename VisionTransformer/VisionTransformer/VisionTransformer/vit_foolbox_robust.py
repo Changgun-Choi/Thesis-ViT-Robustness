@@ -2,7 +2,7 @@
 # git stash
 # git pull
 # conda activate thesis
-# cd /home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
+# cd /home/cchoi/data/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
 # python vit_foolbox_robust.py --model_name vit_s --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
@@ -14,7 +14,7 @@
 
 #python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --filter y '--filter_f' low --data_path server 
 
-
+#!pip install tensorflow
 # nvidia-smi
 """ A simple example that demonstrates how to run a single attack against a PyTorch ResNet-18 model for different epsilons and how to then report
 the robust accuracy """
@@ -161,54 +161,31 @@ if __name__ == '__main__':
             timm.list_models(pretrained=True) 
             timm.list_models('*mobilenetv2*')
             
-            
+            ############
             import tensorflow as tf
             from tensorflow import keras
             new_model = tf.keras.models.load_model('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/Trained/EnetB0_CIFAR10_TL.h5')
-            ############
+            
             
             import tensorflow.keras as keras
             import efficientnet.tfkeras as efn
             from keras.layers import Dense, Dropout, Activation, BatchNormalization, Flatten
             from keras.backend import sigmoid
             from keras.models import Model
-
-            class SwishActivation(Activation):
-                
-                def __init__(self, activation, **kwargs):
-                    super(SwishActivation, self).__init__(activation, **kwargs)
-                    self.__name__ = 'swish_act'
             
-            def swish_act(x, beta = 1):
-                return (x * sigmoid(beta * x))
             
             from keras.utils.generic_utils import get_custom_objects
             from keras.layers import Activation
-            get_custom_objects().update({'swish_act': SwishActivation(swish_act)})
-            #sm.set_framework('tf.keras')
-            model = efn.EfficientNetB0(include_top=False, input_shape=(32,32,3), pooling='avg', weights='imagenet')
+            from keras.backend import sigmoid
+            def SwishActivation(x, beta = 1):
+                return (x * sigmoid(beta * x))
 
-            # building 2 fully connected layer 
-            x = model.output
-            
-            x = BatchNormalization()(x)
-            x = Dropout(0.7)(x)
-            
-            x = Dense(512)(x)
-            x = BatchNormalization()(x)
-            x = Activation(swish_act)(x)
-            x = Dropout(0.5)(x)
-            
-            x = Dense(128)(x)
-            x = BatchNormalization()(x)
-            x = Activation(swish_act)(x)
-            
-            # output layer
-            predictions = Dense(10, activation="softmax")(x)
-            
-            model_final = Model(inputs = model.input, outputs = predictions)
-            
-            model_final.summary()
+            get_custom_objects().update({'SwishActivation': SwishActivation})            
+            from keras.models import load_model
+#get_custom_objects().update({'swish_act': SwishActivation})
+            new_model = load_model('C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer/Trained/Efficient_Cifar10.h5', custom_objects={'SwishActivation': SwishActivation})
+            new_model.summary()
+
             
             #%%
  
@@ -228,9 +205,9 @@ if __name__ == '__main__':
     if args.data_path == 'local':
         data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
     elif args.data_path == 'server':
-        data_path = '/home/cchoi/Thesis_data/data/val'
+        data_path = '/home/cchoi/data/Thesis_data/data/val'
     elif args.data_path == 'full_server':
-        data_path = '/home/cchoi/Thesis_data/val'
+        data_path = '/home/cchoi/data/Thesis_data/val'
             
         
     testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
