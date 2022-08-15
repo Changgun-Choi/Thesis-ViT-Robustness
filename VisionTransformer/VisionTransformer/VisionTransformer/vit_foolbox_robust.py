@@ -266,6 +266,7 @@ if __name__ == '__main__':
     
                         robust_accuracy[eps_id] = (get_acc(fmodel, x_adv, labels))
                         print(robust_accuracy)
+                        robust_acc += robust_accuracy / len(val_loader) 
                         #success += robust_accuracy
                         #print(robust_accuracy)
                     #robust_acc += robust_accuracy
@@ -275,7 +276,7 @@ if __name__ == '__main__':
                     robust_accuracy = 1 - success.mean(dim=-1)
                     #obust_acc = robust_accuracy / args.attack_epochs
                 
-                robust_acc += robust_accuracy / len(val_loader) 
+                #robust_acc += robust_accuracy / len(val_loader) 
                     
                 #robust_acc = robust_accuracy /len(val_loader) 
                 print(robust_acc)
