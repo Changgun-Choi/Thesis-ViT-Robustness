@@ -266,8 +266,9 @@ if __name__ == '__main__':
                         x_adv = torch.clamp(images + new_grad, 0, 1).detach_()
     
                         robust_accuracy[eps_id] = (get_acc(fmodel, x_adv, labels))
-                        print(robust_accuracy)
+                        #print(robust_accuracy)
                         robust_acc += robust_accuracy / len(val_loader) 
+                        print(robust_acc)
                         #success += robust_accuracy
                         #print(robust_accuracy)
                     #robust_acc += robust_accuracy
