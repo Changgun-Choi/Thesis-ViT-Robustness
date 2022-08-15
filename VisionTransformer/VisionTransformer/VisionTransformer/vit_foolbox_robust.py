@@ -275,10 +275,7 @@ if __name__ == '__main__':
                     robust_accuracy = 1 - success.mean(dim=-1)
                     #obust_acc = robust_accuracy / args.attack_epochs
                 
-                if batch_idx == 0:
-                    robust_acc = robust_accuracy / len(val_loader) 
-                else:
-                    robust_acc += robust_accuracy / len(val_loader) 
+                robust_acc += robust_accuracy / len(val_loader) 
                     
                 #robust_acc = robust_accuracy /len(val_loader) 
                 print(robust_acc)
