@@ -232,11 +232,12 @@ if __name__ == '__main__':
         if args.PGD_change == 'no': 
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
             accuracy = 0 
-            Robust = 0
+            #Robust = 0
+            robust_acc = 0  # Update acc
             success = torch.zeros(len(epsilons),args.batch_size).to(device)
             print(len(val_loader))
             for batch_idx, (image, label) in enumerate(val_loader):
-                robust_acc = 0  # Update acc
+                
                 print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
                 images = image.to(device)
                 labels = label.to(device)
@@ -266,9 +267,8 @@ if __name__ == '__main__':
                         x_adv = torch.clamp(images + new_grad, 0, 1).detach_()
     
                         robust_accuracy[eps_id] = (get_acc(fmodel, x_adv, labels))
-                        #print(robust_accuracy)
-                        robust_acc += robust_accuracy / len(val_loader) 
-                        print(robust_acc)
+                        print(robust_accuracy)
+                        robust_acc += robust_accuracy #/ len(val_loader) 
                         #success += robust_accuracy
                         #print(robust_accuracy)
                     #robust_acc += robust_accuracy
@@ -280,14 +280,14 @@ if __name__ == '__main__':
                 
                 #robust_acc += robust_accuracy / len(val_loader) 
                     
-                Robust += robust_acc /len(val_loader) 
-                print(Robust)
+            robust_acc = robust_acc /len(val_loader) 
+            print(robust_acc)
                 
            #success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
            #robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
             #robust_acc = robust_acc /len(val_loader) 
             print("robust accuracy for perturbations with")
-            for eps, acc in zip(epsilons, Robust):
+            for eps, acc in zip(epsilons, robust_acc):
                 print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   
             plt.figure(figsize=(5,5))
             plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
