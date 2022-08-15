@@ -11,8 +11,8 @@
 #python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
 #python vit_foolbox_robust.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
-
-#python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 10 --filter y '--filter_f' low --data_path server 
+"Filter"
+#CUDA_VISIBLE_DEVICES=5 python vit_foolbox_robust.py --model_name vit_hybrid --attack_name PGD --batch_size 16 --data_divide 10 --filter y --data_path server --filter_f high 
 
 #!pip install tensorflow
 # nvidia-smi
@@ -245,7 +245,7 @@ if __name__ == '__main__':
                 "Full Pass result"
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 
                 if args.filter =='y':
-                    #print('y')
+              
                     filter = 32
                     import torch_dct as dct
                     #if filter:
@@ -265,6 +265,7 @@ if __name__ == '__main__':
                         x_adv = torch.clamp(images + new_grad, 0, 1).detach_()
     
                         robust_accuracy[eps_id] = (get_acc(fmodel, x_adv, labels))
+                        print(robust_accuracy)
                         #success += robust_accuracy
                         #print(robust_accuracy)
                     #robust_acc += robust_accuracy
@@ -275,6 +276,7 @@ if __name__ == '__main__':
                     #obust_acc = robust_accuracy / args.attack_epochs
                     
                 robust_acc = robust_accuracy /len(val_loader) 
+                print(robust_acc)
                 
            #success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
            #robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
