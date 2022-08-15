@@ -280,7 +280,7 @@ if __name__ == '__main__':
                 else:
                     robust_acc += robust_accuracy / len(val_loader) 
                     
-                robust_acc = robust_accuracy /len(val_loader) 
+                #robust_acc = robust_accuracy /len(val_loader) 
                 print(robust_acc)
                 
            #success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
