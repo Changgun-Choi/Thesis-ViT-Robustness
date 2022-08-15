@@ -286,7 +286,7 @@ if __name__ == '__main__':
            #robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
             #robust_acc = robust_acc /len(val_loader) 
             print("robust accuracy for perturbations with")
-            for eps, acc in zip(epsilons, robust_acc):
+            for eps, acc in zip(epsilons, Robust):
                 print(f"  Linf norm ≤ {eps:<6}: {acc.item() * 100:4.1f} %")   
             plt.figure(figsize=(5,5))
             plt.plot(epsilons, robust_accuracy.cpu().numpy()) 
