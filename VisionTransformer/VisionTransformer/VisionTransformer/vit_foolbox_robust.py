@@ -232,10 +232,11 @@ if __name__ == '__main__':
         if args.PGD_change == 'no': 
             attack = LinfPGD()  # LinfPGD = LinfProjectedGradientDescentAttack # Distance Measure : Linf
             accuracy = 0 
-            robust_acc = 0
+            Robust = 0
             success = torch.zeros(len(epsilons),args.batch_size).to(device)
             print(len(val_loader))
             for batch_idx, (image, label) in enumerate(val_loader):
+                robust_acc = 0  # Update acc
                 print("Attack: {}/{}".format(batch_idx+1, len(val_loader)-1))
                 images = image.to(device)
                 labels = label.to(device)
@@ -278,8 +279,8 @@ if __name__ == '__main__':
                 
                 #robust_acc += robust_accuracy / len(val_loader) 
                     
-                #robust_acc = robust_accuracy /len(val_loader) 
-                print(robust_acc)
+                Robust += robust_acc /len(val_loader) 
+                print(Robust)
                 
            #success = success/len(val_loader)            #  # succes of Attack (lowering accuracy)
            #robust_accuracy = 1 - success.mean(dim = -1) # t.mean(dim=1): Mean of last dimension (different with other dim)
