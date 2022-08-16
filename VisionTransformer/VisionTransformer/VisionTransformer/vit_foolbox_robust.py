@@ -244,7 +244,7 @@ if __name__ == '__main__':
            
                 #images, labels = ep.astensors(images, labels)
                 clean_acc = get_acc(fmodel, images, labels)
-                "Full Pass result"
+                "Filter: Full Pass result"
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons) 
                 if args.filter =='y':
               
