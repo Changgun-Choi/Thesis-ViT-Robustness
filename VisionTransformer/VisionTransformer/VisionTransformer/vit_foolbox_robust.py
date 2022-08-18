@@ -121,6 +121,16 @@ if __name__ == '__main__':
             "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py
             model = timm.create_model('vit_base_r50_s16_224_in21k', pretrained=True).eval().to(device)
             # vit_base_r50_s16_384  # vit_base_resnet50_384 #  vit_large_r50_s32_224
+            #def vit_base_r50_s16_224_in21k(pretrained=False, **kwargs):
+            """ R50+ViT-B/16 hybrid model from original paper (https://arxiv.org/abs/2010.11929).
+            ImageNet-21k weights @ 224x224, source https://github.com/google-research/vision_transformer.
+            """
+    #backbone = _resnetv2(layers=(3, 4, 9), **kwargs)
+    #model_kwargs = dict(embed_dim=768, depth=12, num_heads=12, representation_size=768, **kwargs)
+    #model = _create_vision_transformer_hybrid(
+    #    'vit_base_r50_s16_224_in21k', backbone=backbone, pretrained=pretrained, **model_kwargs)
+    #return model
+            
             
         elif args.model_name == 'deit': 
             model = torch.hub.load('facebookresearch/deit:main','deit_base_patch16_224', pretrained=True).eval().to(device)
@@ -205,7 +215,8 @@ if __name__ == '__main__':
     if args.data_path == 'local':
         data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
     elif args.data_path == 'server':
-        data_path = '/home/cchoi/data/Thesis_data/data/val'
+        data_path =  '/home/cchoi/data/Thesis_data/data/valid/val'
+        #data_path = '/home/cchoi/data/Thesis_data/data/val'
     elif args.data_path == 'full_server':
         data_path = '/home/cchoi/data/Thesis_data/val'
             
