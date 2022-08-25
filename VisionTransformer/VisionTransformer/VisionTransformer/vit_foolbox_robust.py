@@ -1,15 +1,14 @@
 "Server"
 # git stash
 # git pull
-# conda activate thesis
+# conda activate pytorch
 # cd /home/cchoi/data/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
 # python vit_foolbox_robust.py --model_name vit_s --attack_name PGD --batch_size 16 --data_divide 1000 --data_path server 
 
 #!/usr/bin/env python3
 #cd "C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
-#python vit_foolbox_robust.py --model_name efficient --attack_name FGSM --batch_size 16 --data_divide 1000 
-#python vit_foolbox_robust.py --model_name efficient --attack_name PGD --batch_size 16 --data_divide 10 --data_path server
-#python vit_foolbox_robust.py --model_name VGG --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
+"Run Code"
+#CUDA_VISIBLE_DEVICES=5 python vit_foolbox_robust.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 50 --filter y --data_path full_server --filter_f high 
 
 "Filter"
 #CUDA_VISIBLE_DEVICES=5 python vit_foolbox_robust.py --model_name vit_hybrid --attack_name PGD --batch_size 16 --data_divide 10 --filter y --data_path server --filter_f high 
@@ -257,7 +256,7 @@ if __name__ == '__main__':
                 clean_acc = get_acc(fmodel, images, labels)
                 "Filter: Full Pass result"
                 raw_advs, clipped_advs, succ = attack(fmodel, images, labels, epsilons=epsilons)
-                print("attacked")
+                #print("attacked")
                 if args.filter =='y':
               
                     filter = 32
