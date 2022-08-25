@@ -1,8 +1,8 @@
 "Server"
 # git stash
 # git pull
-# conda activate thesis
-# cd /home/cchoi/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
+# conda activate pytorch
+# cd /home/cchoi/data/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
 # python vit_foolbox_robust.py --model_name vit_s --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
