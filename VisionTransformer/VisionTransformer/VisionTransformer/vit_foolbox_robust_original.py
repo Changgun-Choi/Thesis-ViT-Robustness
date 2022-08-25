@@ -3,6 +3,7 @@
 # git pull
 # conda activate pytorch
 # cd /home/cchoi/data/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
+"CUDA_VISIBLE_DEVICES=5 python vit_foolbox_robust_original.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 62  --data_path full_server"
 # python vit_foolbox_robust.py --model_name vit_s --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
@@ -175,7 +176,7 @@ if __name__ == '__main__':
     elif args.data_path == 'server':
         data_path = '/home/cchoi/Thesis_data/data/val'
     elif args.data_path == 'full_server':
-        data_path = '/home/cchoi/Thesis_data/val'
+        data_path = '/home/cchoi/data/Thesis_data/val'
         
     testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
     sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.1 : 5000
