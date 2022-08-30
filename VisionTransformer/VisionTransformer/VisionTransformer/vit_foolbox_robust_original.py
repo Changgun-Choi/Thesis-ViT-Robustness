@@ -188,7 +188,9 @@ if __name__ == '__main__':
        
             #%%
  
-    preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
+    #preprocessing = dict(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], axis=-3)   # normalize inside model.  
+    preprocessing = dict(mean=[0.4914, 0.4822, 0.4465], std=[0.2023, 0.1994, 0.2010], axis=-3)   # normalize inside model.  
+
     fmodel = PyTorchModel(model, bounds=(0, 1), preprocessing=preprocessing)
     
     test_transform = transforms.Compose([
