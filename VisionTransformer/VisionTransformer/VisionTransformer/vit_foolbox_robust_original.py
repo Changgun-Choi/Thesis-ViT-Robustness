@@ -128,10 +128,10 @@ if __name__ == '__main__':
                 heads = 8,
                 mlp_dim = 512,
                 dropout = 0.1,
-                emb_dropout = 0.1       )
+                emb_dropout = 0.1)
             filepath = '/ceph/cchoi/Thesis_Vision/vision-transformers-cifar10/checkpoint/vit_small-4-ckpt.t7'
             state = torch.load(filepath)
-            model.load_state_dict(state['model']).eval().to(device)  
+            model.load_state_dict(state["model"]).eval().to(device)  
             #optimizer.load_state_dict(state['optimizer'])
             
         elif args.model_name == 'vit_hybrid': #   
