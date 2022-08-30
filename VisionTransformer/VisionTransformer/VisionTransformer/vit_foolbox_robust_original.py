@@ -121,9 +121,9 @@ if __name__ == '__main__':
             #model = timm.create_model('vit_large_patch16_224', pretrained=True).eval().to(device)
             from models.vit_small import ViT
             model = ViT(image_size = 32,
-                patch_size = args.patch,
+                patch_size = 4,
                 num_classes = 10,
-                dim = int(args.dimhead),
+                dim = int(512),
                 depth = 6,
                 heads = 8,
                 mlp_dim = 512,
