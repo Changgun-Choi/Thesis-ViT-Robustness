@@ -125,7 +125,7 @@ if __name__ == '__main__':
                 mlp_dim = 512,
                 dropout = 0.1,
                 emb_dropout = 0.1       )
-            model.load_state_dict(torch.load('/ceph/cchoi/Thesis_Vision/vision-transformers-cifar10/checkpoint/vit_small-4-ckpt.t7'))   
+            model = model.load_state_dict(torch.load('/ceph/cchoi/Thesis_Vision/vision-transformers-cifar10/checkpoint/vit_small-4-ckpt.t7'))   
             
         elif args.model_name == 'vit_hybrid': #   
             "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py
