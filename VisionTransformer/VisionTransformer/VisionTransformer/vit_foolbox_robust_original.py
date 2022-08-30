@@ -130,7 +130,7 @@ if __name__ == '__main__':
                 dropout = 0.1,
                 emb_dropout = 0.1       )
             filepath = '/ceph/cchoi/Thesis_Vision/vision-transformers-cifar10/checkpoint/vit_small-4-ckpt.t7'
-            state = torch.load(filepath)
+            state = torch.load(filepath, strict=False)
             model.load_state_dict(state['model'])
             optimizer.load_state_dict(state['optimizer'])
             
