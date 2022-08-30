@@ -46,8 +46,8 @@ from timm.models.registry import register_model
 from timm.models.layers import trunc_normal_
 from tqdm.notebook import tqdm
 from models import *
-from utils import progress_bar
-from randomaug import RandAugment
+#from utils import progress_bar
+#from randomaug import RandAugment
 from models.vit import ViT
 #%%
 #import json
