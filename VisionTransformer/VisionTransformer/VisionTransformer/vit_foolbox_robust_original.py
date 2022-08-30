@@ -202,7 +202,7 @@ if __name__ == '__main__':
     transform_cifar = transforms.Compose([
     transforms.Resize(32,32),
     transforms.ToTensor(),
-    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+    #transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
 ])
     
     epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  # Maximum perturbation
