@@ -4,6 +4,9 @@
 # conda activate pytorch
 # cd /home/cchoi/data/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
 "CUDA_VISIBLE_DEVICES=5 python vit_foolbox_robust_original.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 62  --data_path full_server"
+"CUDA_VISIBLE_DEVICES=5 python vit_foolbox_robust_original.py --model_name vit_cifar10 --attack_name PGD --batch_size 16 --data_divide 62  --data_path Cifar10"
+
+'vit_cifar10'  #Cifar10
 # python vit_foolbox_robust.py --model_name vit_s --attack_name PGD --batch_size 16 --data_divide 10 --data_path server 
 
 #!/usr/bin/env python3
@@ -109,7 +112,20 @@ if __name__ == '__main__':
              #  ImageNet-1k weights fine-tuned from in21k @ 224x224
         elif args.model_name == 'vit_L':
             model = timm.create_model('vit_large_patch16_224', pretrained=True).eval().to(device)  
-             
+        
+        elif args.model_name == 'vit_cifar10':
+            #model = timm.create_model('vit_large_patch16_224', pretrained=True).eval().to(device)
+            from models.vit_small import ViT
+            model = ViT(image_size = 32,
+                patch_size = args.patch,
+                num_classes = 10,
+                dim = int(args.dimhead),
+                depth = 6,
+                heads = 8,
+                mlp_dim = 512,
+                dropout = 0.1,
+                emb_dropout = 0.1       )
+            model.load_state_dict(torch.load('/ceph/cchoi/Thesis_Vision/vision-transformers-cifar10/checkpoint/vit_small-4-ckpt.t7'))   
             
         elif args.model_name == 'vit_hybrid': #   
             "Hybrid Vision Transformers "  # https://github.com/xinqi-fan/ABAW2021/blob/main/models/vision_transformer_hybrid.py
@@ -167,23 +183,37 @@ if __name__ == '__main__':
         #transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])    
     
+    transform_cifar = transforms.Compose([
+    transforms.Resize(32,32),
+    transforms.ToTensor(),
+    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+])
+    
     epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  # Maximum perturbation
     
     #epsilons = [0, 0.1/255, 0.3/255, 0.5/255, 0.8/255, 1/255, 4/255]  # 0.5/255, 0.8/255
     
     if args.data_path == 'local':
         data_path = 'C:/Users/ChangGun Choi/Team Project/Thesis_data/val'
+        
     elif args.data_path == 'server':
         data_path = '/home/cchoi/Thesis_data/data/val'
     elif args.data_path == 'full_server':
         data_path = '/home/cchoi/data/Thesis_data/val'
+        testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
+        sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.1 : 5000
+        print(len(testset))
+        print(len(sample)) # 5000
+        valset = torch.utils.data.Subset(testset, sample) 
+        val_loader = torch.utils.data.DataLoader(valset, args.batch_size ,drop_last=True)
         
-    testset = torchvision.datasets.ImageNet(data_path, split='val', transform=test_transform)
-    sample = list(range(0, len(testset), args.data_divide))   # 16 * 3125 * 0.1 : 5000
-    print(len(testset))
-    print(len(sample)) # 5000
-    valset = torch.utils.data.Subset(testset, sample) 
-    val_loader = torch.utils.data.DataLoader(valset, args.batch_size ,drop_last=True)
+    elif args.data_path == 'Cifar10':
+        data_path = '/home/cchoi/data/Thesis_data'
+        valset = torchvision.datasets.CIFAR10(root=data_path, train=False, download=True, transform=transform_cifar)
+        val_loader = torch.utils.data.DataLoader(valset, batch_size=100, shuffle=False, num_workers=8)
+    
+        
+    
     
     "clean_accuracy"    
     def get_acc(model, inputs, labels):
