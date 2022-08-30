@@ -137,7 +137,8 @@ if __name__ == '__main__':
             for k, v in state_dict.items():
                 name = k[7:] # remove 'module.' of dataparallel
                 new_state_dict[name]=v
-            model.load_state_dict(new_state_dict).eval().to(device)  
+            model.load_state_dict(new_state_dict)
+            model.eval().to(device)  
             #optimizer.load_state_dict(state['optimizer'])
             
         elif args.model_name == 'vit_hybrid': #   
