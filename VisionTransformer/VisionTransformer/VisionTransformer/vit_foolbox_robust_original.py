@@ -131,7 +131,13 @@ if __name__ == '__main__':
                 emb_dropout = 0.1)
             filepath = '/ceph/cchoi/Thesis_Vision/vision-transformers-cifar10/checkpoint/vit_small-4-ckpt.t7'
             state = torch.load(filepath)
-            model.load_state_dict(state["model"]).eval().to(device)  
+            state_dict =state["model"]
+            from collections import OrderedDict
+            new_state_dict = OrderedDict()
+            for k, v in state_dict.items():
+                name = k[7:] # remove 'module.' of dataparallel
+                new_state_dict[name]=v
+            model.load_state_dict(new_state_dict).eval().to(device)  
             #optimizer.load_state_dict(state['optimizer'])
             
         elif args.model_name == 'vit_hybrid': #   
