@@ -24,10 +24,10 @@ cd "/home/cchoi/data/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTra
 ### Adversarial attack(White-box)
 python vit_foolbox_robust_original.py --model_name vit --attack_name PGD --batch_size 16 --data_divide 62  --data_path full_server
 ### Frequency Filter applied to Adversarial attack
-1) High-frequency
+1. High-frequency
 
 python vit_foolbox_frequency.py --model_name vit_hybrid --attack_name PGD --batch_size 16 --data_divide 10 --filter y --data_path full_server --filter_f high
-2) Low-frequency
+2. Low-frequency
 
 python vit_foolbox_frequency.py --model_name vit_hybrid --attack_name PGD --batch_size 16 --data_divide 10 --filter y --data_path full_server --filter_f low
 ### Calibration Error Analysis
