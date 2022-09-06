@@ -27,6 +27,7 @@ python vit_foolbox_robust_original.py --model_name vit --attack_name PGD --batch
 1. High-frequency
 
 python vit_foolbox_frequency.py --model_name vit_hybrid --attack_name PGD --batch_size 16 --data_divide 10 --filter y --data_path full_server --filter_f high
+
 2. Low-frequency
 
 python vit_foolbox_frequency.py --model_name vit_hybrid --attack_name PGD --batch_size 16 --data_divide 10 --filter y --data_path full_server --filter_f low
