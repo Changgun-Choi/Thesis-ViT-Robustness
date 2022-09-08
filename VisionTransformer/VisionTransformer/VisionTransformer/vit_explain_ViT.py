@@ -1,6 +1,4 @@
-"https://jacobgil.github.io/deeplearning/vision-transformer-explainability"
-
-#1) Attack 전후의 attentino weight k                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 reeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+"https://jacobgil.github.io/deeplearning/vision-transformer-explainability"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          reeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 
 #set PYTHONPATH="C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer"
 #cd C:/Users/ChangGun Choi/Team Project/Thesis_Vision/VisionTransformer/VisionTransformer/VisionTransformer
@@ -89,7 +87,7 @@ if __name__ == '__main__':
     
     #%%
     if args.model_name == 'vit':
-        "args_hyper 들을 받아서 정해지는 것들을 maually 지정"
+       
         #model = VisionTransformer(patch_vec_size=48, num_patches=64,latent_vec_dim=128, num_heads=8, mlp_hidden_dim=64, drop_rate=0., num_layers=12, num_classes=10).to(device)
         #model.load_state_dict(torch.load('./model.pth'))            
         model = timm.create_model('vit_base_patch16_224', pretrained=True).eval()     # RuntimeError: The size of tensor a (197) must match the size of tensor b (577) at non-singleton dimension 1
@@ -135,37 +133,27 @@ if __name__ == '__main__':
     
     #img_tensor = input_tensor.reshape(1,64,-1)  ##############################################################################      
     #img_tensor                        
-    "ViT 쓰려면 patches.reshape[batch_size, num_patch, -1] 형태로 만들어야함 "
     img_tensor.requires_grad_(True)
-    # 이미지를 모델에 통과시킴
     output = model(img_tensor)
 
-    # 오차값 구하기 (레이블 263은 웰시코기)
     target = torch.tensor([263]).cuda()
-    init_pred = output.max(1, keepdim=True)[1] # 로그 확률의 최대값을 가지는 인덱스를 얻습니다
+    init_pred = output.max(1, keepdim=True)[1] 
     init_pred
     loss = F.nll_loss(output, target) 
-    # 기울기값 구하기
     model.zero_grad()
     loss.backward()
     
-    epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  # 기울기의 방향(sign)이 양수인곳에 epsilon 만큼 증가, 음수는 감소
-    # 이미지의 기울기값을 추출
+    epsilons = [0, 0.1/255, 0.3/255, 1/255, 4/255]  # 
     gradient = img_tensor.grad.data            
-        # 생성된 적대적 예제를 모델에 통과시킴
         #output = model(perturbed_data)
         #output[:,263]
-        # ## 적대적 예제 성능 확인
         
         #perturbed_prediction = output.max(1, keepdim=True)[1]
         #perturbed_prediction_idx = perturbed_prediction.item()
         #perturbed_prediction_name = idx2class[perturbed_prediction_idx]
         #print(output[:,263])
-        #print("예측된 레이블 번호:", perturbed_prediction_idx)  # 예측된 레이블 번호: 172
-        #print("레이블 이름:", perturbed_prediction_name)   # 레이블 이름: whippet
     #%% Visualize 
 
-    # 시각화를 위해 넘파이 행렬 변환
     for epsilon in epsilons:
         
         original_img_view = img_tensor.squeeze(0).detach().cpu()
@@ -178,13 +166,11 @@ if __name__ == '__main__':
     
         #plt.imshow(perturbed_data_view)
     
-        # ## 원본과 적대적 예제 비교
         f, a = plt.subplots(1, 2, figsize=(10, 10))
         # 원본
         #a[0].set_title(prediction_name)
         a[0].imshow(original_img_view)
     
-        # 적대적 예제
         #a[1].set_title(perturbed_prediction_name)
         a[1].imshow(perturbed_data_view)
         plt.show()
